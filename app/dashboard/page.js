@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Grievance from '@/models/Grievance';
 import MembershipCard from '@/components/MembershipCard';
+import InstallButton from '@/components/InstallButton';
 import Link from 'next/link';
 import { FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -32,12 +33,15 @@ export default async function DashboardPage() {
   return (
     <div className="p-6 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white display-font mb-1">
-          வணக்கம்,{' '}
-          <span className="gradient-text">{user?.name?.split(' ')[0] || 'Member'}</span>! 👋
-        </h1>
-        <p className="text-white/60 text-sm md:text-base mt-2">Orathanadu Constituency 175 · {user?.panchayat || 'Profile Incomplete'}</p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-white display-font mb-1">
+            வணக்கம்,{' '}
+            <span className="gradient-text">{user?.name?.split(' ')[0] || 'Member'}</span>! 👋
+          </h1>
+          <p className="text-white/60 text-sm md:text-base mt-2">Orathanadu Constituency 175 · {user?.panchayat || 'Profile Incomplete'}</p>
+        </div>
+        <InstallButton />
       </div>
 
       {/* Membership Card */}

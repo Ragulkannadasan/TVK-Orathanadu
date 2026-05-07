@@ -1,9 +1,7 @@
 import dbConnect from '@/lib/mongodb';
 import Otp from '@/models/Otp';
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.AUTH_RESEND_API_KEY || process.env.AUTH_RESEND_KEY);
+import nodemailer from 'nodemailer';
 
 export async function POST(req) {
   try {
@@ -27,9 +25,22 @@ export async function POST(req) {
       { upsert: true, new: true }
     );
 
-    // Send email using Resend
-    const { data, error } = await resend.emails.send({
-      from: process.env.AUTH_EMAIL_FROM || 'onboarding@resend.dev',
+    // Always log OTP in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`\n\n🔑 DEVELOPMENT OTP FOR ${email}: ${otp}\n\n`);
+    }
+
+    // Configure Nodemailer Transporter
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_EMAIL,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: `"TVK Orathanadu" <${process.env.GMAIL_EMAIL}>`,
       to: email,
       subject: 'TVK Orathanadu – Your Login OTP',
       html: `
@@ -45,26 +56,20 @@ export async function POST(req) {
           </div>
         </div>
       `,
-    });
+    };
 
-    if (error) {
-      console.error('Resend API Error:', error);
-      // In development, we can still proceed by printing the OTP to the console
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`\n\n🔑 DEVELOPMENT OTP FOR ${email}: ${otp}\n\n`);
-        return NextResponse.json({ success: true, devMode: true });
-      }
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    // Also log in dev mode even if email succeeded
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`\n\n🔑 DEVELOPMENT OTP FOR ${email}: ${otp}\n\n`);
-    }
+    // Send the email
+    await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error sending OTP:', error);
+    
+    // In development, if email fails (e.g. no credentials), we still succeed because we logged it
+    if (process.env.NODE_ENV === 'development') {
+      return NextResponse.json({ success: true, devMode: true });
+    }
+    
     return NextResponse.json({ error: error.message || 'Failed to send OTP' }, { status: 500 });
   }
 }

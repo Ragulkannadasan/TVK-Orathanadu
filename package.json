@@ -11,14 +11,16 @@
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "lucide-react": "^1.14.0",
+    "mailer": "^0.6.7",
     "mongoose": "^9.6.1",
     "nanoid": "^5.1.11",
     "next": "16.2.5",
     "next-auth": "^5.0.0-beta.31",
+    "node": "^25.9.0",
+    "nodemailer": "^7.0.13",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
-    "resend": "^6.12.3",
     "shortid": "^2.2.17"
   },
   "devDependencies": {

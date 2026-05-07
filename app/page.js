@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import InstallButton from '@/components/InstallButton';
 
 export const metadata = {
   title: 'TVK Orathanadu – மக்கள் போர்ட்டல் | People\'s Portal',
@@ -15,6 +16,11 @@ export default async function LandingPage() {
 
   return (
     <main className="min-h-screen bg-transparent overflow-x-hidden">
+      {/* Absolute Header Controls */}
+      <div className="absolute top-6 right-6 z-50">
+        <InstallButton />
+      </div>
+
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20">
         {/* Background */}
