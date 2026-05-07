@@ -68,7 +68,7 @@ export default async function LandingPage() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <Link
-              href="/login"
+              href="/signup"
               className="btn-primary text-base px-8 py-3.5 rounded-xl"
             >
               🗳️ கட்சியில் சேரு / Join Party

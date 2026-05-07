@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, ArrowRight, Loader2, KeyRound } from 'lucide-react';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -69,21 +69,21 @@ export default function LoginPage() {
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#800000] mb-4 glow-maroon animate-glow-pulse">
             <span className="text-[#FFD700] font-black text-xl">TVK</span>
           </div>
-          <h1 className="text-white font-bold text-2xl display-font">Welcome</h1>
-          <p className="tamil text-[#FFD700]/70 text-sm mt-1">தமிழக வெற்றி கழகம் – ஓரத்தநாடு</p>
+          <h1 className="text-white font-bold text-2xl display-font">Join Us</h1>
+          <p className="tamil text-[#FFD700]/70 text-sm mt-1">தமிழக வெற்றி கழகத்தில் இணையுங்கள்</p>
         </div>
 
         {/* Card */}
         <div className="glass-card p-8">
           {step === 1 ? (
             <>
-              <h2 className="text-white font-semibold text-lg mb-1 display-font">Sign in with Email</h2>
+              <h2 className="text-white font-semibold text-lg mb-1 display-font">Sign Up to Connect</h2>
               <p className="text-white/50 text-sm mb-6">
-                Enter your email and we'll send you a One-Time Password (OTP) to securely log in.
+                Register with your email to become an official digital member of TVK Orathanadu.
               </p>
 
               <form onSubmit={handleSendOtp} className="space-y-4">
@@ -120,16 +120,20 @@ export default function LoginPage() {
                     <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <>
-                      Send OTP
+                      Send Registration OTP
                       <ArrowRight size={18} />
                     </>
                   )}
                 </button>
+                
+                <p className="text-white/40 text-xs text-center mt-4">
+                  By signing up, you agree to our Terms, Privacy Policy, and Cookies Policy.
+                </p>
               </form>
             </>
           ) : (
             <>
-              <h2 className="text-white font-semibold text-lg mb-1 display-font">Enter OTP</h2>
+              <h2 className="text-white font-semibold text-lg mb-1 display-font">Verify Email</h2>
               <p className="text-white/50 text-sm mb-6">
                 We've sent a 6-digit code to <strong className="text-[#FFD700]">{email}</strong>
               </p>
@@ -171,7 +175,7 @@ export default function LoginPage() {
                     <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <>
-                      Secure Login
+                      Complete Registration
                       <ArrowRight size={18} />
                     </>
                   )}
@@ -189,12 +193,12 @@ export default function LoginPage() {
           )}
         </div>
 
-        {/* Sign Up Box */}
+        {/* Log In Box */}
         <div className="glass-card mt-4 p-4 text-center">
           <p className="text-white/70 text-sm">
-            Don't have an account?{' '}
-            <Link href="/signup" className="text-[#FFD700] font-semibold hover:underline">
-              Sign up
+            Have an account?{' '}
+            <Link href="/login" className="text-[#FFD700] font-semibold hover:underline">
+              Log in
             </Link>
           </p>
         </div>
