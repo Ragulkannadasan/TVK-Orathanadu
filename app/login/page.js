@@ -49,7 +49,14 @@ export default function LoginPage() {
       if (res?.error) {
         setError(res.error.replace('Error: ', ''));
       } else {
-        router.push('/dashboard');
+        const sessionRes = await fetch('/api/auth/session');
+        const session = await sessionRes.json();
+        
+        if (session?.user?.profileComplete) {
+          router.push('/dashboard');
+        } else {
+          router.push('/profile-setup');
+        }
         router.refresh();
       }
     } catch (err) {

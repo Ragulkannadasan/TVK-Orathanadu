@@ -48,10 +48,18 @@ export default function SignupPage() {
       
       if (res?.error) {
         setError(res.error.replace('Error: ', ''));
-      } else {
-        router.push('/dashboard');
-        router.refresh();
+        return;
       }
+
+      const sessionRes = await fetch('/api/auth/session');
+      const session = await sessionRes.json();
+      
+      if (session?.user?.profileComplete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/profile-setup');
+      }
+      router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {
