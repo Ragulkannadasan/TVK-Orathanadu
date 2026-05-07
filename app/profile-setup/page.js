@@ -72,7 +72,13 @@ export default function ProfileSetupPage() {
           </div>
           <h2 className="text-white font-bold text-2xl mb-2">Profile Created!</h2>
           <p className="tamil text-[#FFD700]/70">உங்கள் சுயவிவரம் உருவாக்கப்பட்டது</p>
-          <p className="text-white/50 text-sm mt-2">Redirecting to dashboard...</p>
+          <p className="text-white/50 text-sm mt-2 mb-6">Redirecting to dashboard...</p>
+          <button
+            onClick={() => window.location.href = '/dashboard'}
+            className="btn-primary px-6 py-2 rounded-lg text-sm"
+          >
+            Go to Dashboard Now
+          </button>
         </div>
       </main>
     );
