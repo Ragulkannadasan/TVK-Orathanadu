@@ -22,7 +22,7 @@ export async function POST(req) {
     await Otp.findOneAndUpdate(
       { email: email.toLowerCase() },
       { otp, expiresAt },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     // Always log OTP in development
