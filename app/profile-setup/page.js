@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { User, Phone, CreditCard, MapPin, Hash, Loader2, CheckCircle } from 'lucide-react';
 
@@ -151,6 +152,12 @@ export default function ProfileSetupPage() {
             </>
           )}
         </form>
+
+        <div className="text-center mt-6">
+          <Link href="/" className="text-white/40 text-sm hover:text-white/70 transition-colors">
+            ← Back to Home
+          </Link>
+        </div>
       </div>
     </main>
   );
