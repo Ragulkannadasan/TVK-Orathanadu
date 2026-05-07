@@ -6,7 +6,7 @@ export default async function PoruppalarLayout({ children }) {
   const session = await auth();
   
   if (!session?.user) redirect('/login');
-  if (!session.user.profileComplete) redirect('/profile-setup');
+
   if (session.user.role !== 'Poruppalar' && session.user.role !== 'Admin') {
     redirect('/dashboard');
   }

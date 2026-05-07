@@ -11,7 +11,7 @@ export const metadata = {
 export default async function LandingPage() {
   const session = await auth();
   if (session?.user) {
-    redirect(session.user.profileComplete ? '/dashboard' : '/profile-setup');
+    redirect('/dashboard');
   }
 
   return (

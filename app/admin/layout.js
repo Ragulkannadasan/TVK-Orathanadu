@@ -6,7 +6,7 @@ export default async function AdminLayout({ children }) {
   const session = await auth();
   
   if (!session?.user) redirect('/admin-login');
-  if (!session.user.profileComplete) redirect('/profile-setup');
+
   if (session.user.role !== 'Admin') redirect('/dashboard');
 
   return (

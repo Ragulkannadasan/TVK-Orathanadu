@@ -44,6 +44,19 @@ export default async function DashboardPage() {
         <InstallButton />
       </div>
 
+      {/* Profile Incomplete Banner */}
+      {(!user?.mobile || !user?.voterId || !user?.panchayat) && (
+        <div className="mb-8 p-5 rounded-2xl bg-[#FFD700]/10 border border-[#FFD700]/30 flex flex-col sm:flex-row gap-4 items-center justify-between animate-fade-in shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+          <div>
+            <h3 className="text-[#FFD700] font-bold text-lg">Complete Your Profile</h3>
+            <p className="text-white/70 text-sm mt-1">Please provide your personal information to unlock your official digital membership card and ID.</p>
+          </div>
+          <Link href="/profile-setup" className="bg-[#FFD700] text-black font-bold px-6 py-2.5 rounded-lg whitespace-nowrap hover:bg-white transition-colors text-center">
+            Complete Profile →
+          </Link>
+        </div>
+      )}
+
       {/* Membership Card */}
       <section className="mb-8">
         <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider mb-4">

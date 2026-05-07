@@ -11,12 +11,7 @@ export default async function DashboardLayout({ children }) {
     redirect('/login');
   }
 
-  await dbConnect();
-  const user = await User.findById(session.user.userId).lean();
-  
-  if (!user || !user.mobile || !user.voterId || !user.panchayat) {
-    redirect('/profile-setup');
-  }
+
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col md:flex-row pb-20 md:pb-0">
