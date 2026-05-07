@@ -36,3 +36,17 @@ export async function POST(req) {
 
   return NextResponse.json({ success: true, user });
 }
+export async function DELETE() {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  await dbConnect();
+  
+  // We can also delete their grievances here if needed
+  // await Grievance.deleteMany({ userId: session.user.userId });
+  
+  const user = await User.findByIdAndDelete(session.user.userId);
+  if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+
+  return NextResponse.json({ success: true, message: 'Account deleted successfully' });
+}

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { User, Phone, CreditCard, MapPin, Hash, Loader2, CheckCircle, Edit3, LogOut } from 'lucide-react';
+import { User, Phone, CreditCard, MapPin, Hash, Loader2, CheckCircle, Edit3, LogOut, Trash2 } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 import MembershipCard from '@/components/MembershipCard';
 
 const panchayats = [
@@ -22,6 +22,22 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm('⚠ CRITICAL: Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.');
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch('/api/profile', { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete account');
+      await signOut({ callbackUrl: '/' });
+    } catch (err) {
+      setError(err.message);
+      setDeleting(false);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/profile')
@@ -151,6 +167,14 @@ export default function ProfilePage() {
                 >
                   <LogOut size={16} />
                   Sign Out
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white/20 hover:text-red-500/60 transition-all text-xs mt-2"
+                >
+                  <Trash2 size={12} />
+                  {deleting ? 'Deleting...' : 'Delete Account'}
                 </button>
               </div>
             </div>
