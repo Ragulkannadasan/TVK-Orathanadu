@@ -9,6 +9,7 @@ import User from '@/models/User';
 import { NextResponse } from 'next/server';
 
 export async function PATCH(req, { params }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user || session.user.role !== 'Admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -33,20 +34,21 @@ export async function PATCH(req, { params }) {
   }
 
   await dbConnect();
-  const user = await User.findByIdAndUpdate(params.id, updateData, { new: true }).lean();
+  const user = await User.findByIdAndUpdate(id, updateData, { new: true }).lean();
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
   return NextResponse.json({ success: true, user });
 }
 
 export async function DELETE(req, { params }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user || session.user.role !== 'Admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   await dbConnect();
-  const user = await User.findByIdAndDelete(params.id);
+  const user = await User.findByIdAndDelete(id);
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
   return NextResponse.json({ success: true, message: 'User deleted successfully' });

@@ -9,6 +9,7 @@ import Grievance from '@/models/Grievance';
 import { NextResponse } from 'next/server';
 
 export async function PATCH(req, { params }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -22,7 +23,7 @@ export async function PATCH(req, { params }) {
 
   await dbConnect();
   const grievance = await Grievance.findByIdAndUpdate(
-    params.id,
+    id,
     {
       ...(status && { status }),
       ...(actionNotes && { actionNotes }),
