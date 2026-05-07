@@ -1,0 +1,132 @@
+import { auth } from '@/auth';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
+import Grievance from '@/models/Grievance';
+import MembershipCard from '@/components/MembershipCard';
+import Link from 'next/link';
+import { FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+
+export const metadata = { title: 'My Dashboard – TVK Orathanadu' };
+
+export default async function DashboardPage() {
+  const session = await auth();
+  await dbConnect();
+
+  const [userDoc, recentGrievances, counts] = await Promise.all([
+    User.findById(session.user.userId).lean(),
+    Grievance.find({ userId: session.user.userId })
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean(),
+    Grievance.aggregate([
+      { $match: { userId: require('mongoose').Types.ObjectId.createFromHexString(session.user.userId) } },
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]),
+  ]);
+
+  // Next.js Server-to-Client Component Serialization fix
+  const user = JSON.parse(JSON.stringify(userDoc));
+
+  const statusMap = counts.reduce((acc, c) => ({ ...acc, [c._id]: c.count }), {});
+
+  return (
+    <div className="p-6 md:p-8 max-w-5xl">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-white display-font mb-1">
+          வணக்கம்,{' '}
+          <span className="gradient-text">{user?.name?.split(' ')[0] || 'Member'}</span>! 👋
+        </h1>
+        <p className="text-white/60 text-sm md:text-base mt-2">Orathanadu Constituency 175 · {user?.panchayat || 'Profile Incomplete'}</p>
+      </div>
+
+      {/* Membership Card */}
+      <section className="mb-8">
+        <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider mb-4">
+          🆔 Digital Membership Card
+        </h2>
+        <MembershipCard user={user} />
+      </section>
+
+      {/* Stats */}
+      <section className="mb-8">
+        <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider mb-4">
+          📊 Grievance Summary
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard icon={<FileText size={20} />} label="Total" value={(statusMap.Pending || 0) + (statusMap.Investigating || 0) + (statusMap.Resolved || 0)} color="text-white" />
+          <StatCard icon={<Clock size={20} />} label="Pending" value={statusMap.Pending || 0} color="text-amber-400" />
+          <StatCard icon={<AlertCircle size={20} />} label="Investigating" value={statusMap.Investigating || 0} color="text-blue-400" />
+          <StatCard icon={<CheckCircle size={20} />} label="Resolved" value={statusMap.Resolved || 0} color="text-green-400" />
+        </div>
+      </section>
+
+      {/* Recent Grievances */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider">
+            📋 Recent Grievances
+          </h2>
+          <Link href="/dashboard/grievances" className="text-[#FFD700]/70 text-sm hover:text-[#FFD700] transition-colors">
+            View All →
+          </Link>
+        </div>
+
+        {recentGrievances.length === 0 ? (
+          <div className="glass-card rounded-2xl p-10 text-center">
+            <p className="text-white/60 text-base">No grievances submitted yet.</p>
+            <Link href="/dashboard/grievances" className="btn-primary mt-4 inline-block text-sm px-6 py-2 rounded-lg">
+              Submit First Grievance
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {recentGrievances.map((g) => (
+              <div key={g._id.toString()} className="glass-card rounded-xl p-5 flex items-center justify-between hover:border-[#800000]/40 transition-colors">
+                <div>
+                  <span className="text-[#FFD700] text-xs font-mono">#{g.ticketId}</span>
+                  <p className="text-white/80 text-sm mt-0.5 line-clamp-1">{g.description}</p>
+                  <p className="text-white/40 text-xs mt-1">{g.category}</p>
+                </div>
+                <StatusPill status={g.status} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Quick Action */}
+        <div className="mt-8 glass-card rounded-2xl p-6 border border-[#800000]/30 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#800000]/20 rounded-full blur-2xl animate-pulse" />
+          <h3 className="text-white font-bold text-lg mb-1 display-font relative z-10">Have an issue?</h3>
+          <p className="tamil text-[#FFD700]/70 text-sm mb-4 relative z-10">ஒரு புகார் உள்ளதா?</p>
+          <Link href="/dashboard/grievances#new" className="btn-primary text-sm px-5 py-2 rounded-lg inline-block">
+            📢 Report Now
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, color }) {
+  return (
+    <div className="glass-card rounded-2xl p-5 text-center">
+      <div className={`flex justify-center mb-3 ${color} drop-shadow-[0_0_8px_currentColor]`}>{icon}</div>
+      <p className={`text-3xl font-bold display-font ${color}`}>{value}</p>
+      <p className="text-white/70 font-medium text-xs mt-1 uppercase tracking-wider">{label}</p>
+    </div>
+  );
+}
+
+function StatusPill({ status }) {
+  const colors = {
+    Pending: 'badge-pending',
+    Investigating: 'badge-investigating',
+    Resolved: 'badge-resolved',
+  };
+  return (
+    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${colors[status] || ''}`}>
+      {status}
+    </span>
+  );
+}
