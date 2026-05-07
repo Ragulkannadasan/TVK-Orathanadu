@@ -53,6 +53,52 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleBlockUser = async (userId, isBlocked) => {
+    setUpdating(userId);
+    try {
+      await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isBlocked }),
+      });
+      fetchUsers();
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    setUpdating(userId);
+    try {
+      await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+      });
+      fetchUsers();
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const [notificationModal, setNotificationModal] = useState(null);
+  const [notifData, setNotifData] = useState({ title: '', message: '' });
+
+  const handleSendNotification = async () => {
+    if (!notifData.title || !notifData.message) return;
+    try {
+      await fetch('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: notificationModal, ...notifData }),
+      });
+      setNotificationModal(null);
+      setNotifData({ title: '', message: '' });
+      alert('Notification sent!');
+    } catch (err) {
+      alert('Failed to send notification');
+    }
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-5xl">
       <div className="mb-6">
@@ -123,25 +169,51 @@ export default function AdminUsersPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <div className="flex items-center gap-1">
-                          {updating === u._id ? (
-                            <Loader2 size={14} className="animate-spin text-white/40" />
-                          ) : (
-                            ['Voter', 'Poruppalar', 'Admin'].map((r) => (
-                              <button
-                                key={r}
-                                onClick={() => u.role !== r && handleRoleChange(u._id, r)}
-                                disabled={u.role === r}
-                                className={`text-xs px-2.5 py-1 rounded-lg transition-all ${
-                                  u.role === r
-                                    ? 'bg-white/10 text-white/30 cursor-not-allowed'
-                                    : 'bg-white/5 text-white/60 hover:bg-[#800000]/30 hover:text-white'
-                                }`}
-                              >
-                                {r}
-                              </button>
-                            ))
-                          )}
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-1">
+                            {updating === u._id ? (
+                              <Loader2 size={14} className="animate-spin text-white/40" />
+                            ) : (
+                              ['Voter', 'Poruppalar', 'Admin'].map((r) => (
+                                <button
+                                  key={r}
+                                  onClick={() => u.role !== r && handleRoleChange(u._id, r)}
+                                  disabled={u.role === r}
+                                  className={`text-[10px] px-2 py-0.5 rounded transition-all ${
+                                    u.role === r
+                                      ? 'bg-white/10 text-white/30 cursor-not-allowed'
+                                      : 'bg-white/5 text-white/60 hover:bg-[#800000]/30 hover:text-white'
+                                  }`}
+                                >
+                                  {r}
+                                </button>
+                              ))
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleBlockUser(u._id, !u.isBlocked)}
+                              className={`text-[10px] px-2 py-0.5 rounded transition-all ${
+                                u.isBlocked
+                                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                  : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                              }`}
+                            >
+                              {u.isBlocked ? 'Unblock' : 'Block'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u._id)}
+                              className="text-[10px] px-2 py-0.5 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() => setNotificationModal(u._id)}
+                              className="text-[10px] px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-all"
+                            >
+                              Notify
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -196,6 +268,51 @@ export default function AdminUsersPage() {
           <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page === pages} className="flex items-center gap-1 text-white/50 text-sm hover:text-white disabled:opacity-30">
             Next <ChevronRight size={16} />
           </button>
+        </div>
+      )}
+      {/* Notification Modal */}
+      {notificationModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass rounded-2xl p-6 w-full max-w-md border border-white/10 animate-fade-in-up">
+            <h3 className="text-white font-bold text-lg mb-4">Send Notification</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Title</label>
+                <input
+                  type="text"
+                  value={notifData.title}
+                  onChange={(e) => setNotifData({ ...notifData, title: e.target.value })}
+                  placeholder="Notification title"
+                  className="input-dark"
+                />
+              </div>
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Message</label>
+                <textarea
+                  value={notifData.message}
+                  onChange={(e) => setNotifData({ ...notifData, message: e.target.value })}
+                  placeholder="Enter message..."
+                  rows={4}
+                  className="input-dark resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setNotificationModal(null)}
+                  className="btn-secondary flex-1 py-2 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendNotification}
+                  disabled={!notifData.title || !notifData.message}
+                  className="btn-primary flex-[2] py-2 rounded-xl disabled:opacity-50"
+                >
+                  Send Notification
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

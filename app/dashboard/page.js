@@ -2,10 +2,12 @@ import { auth } from '@/auth';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Grievance from '@/models/Grievance';
+import Announcement from '@/models/Announcement';
+import Notification from '@/models/Notification';
 import MembershipCard from '@/components/MembershipCard';
 import InstallButton from '@/components/InstallButton';
 import Link from 'next/link';
-import { FileText, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Clock, CheckCircle, AlertCircle, Bell, Megaphone } from 'lucide-react';
 
 export const metadata = { title: 'My Dashboard – TVK Orathanadu' };
 
@@ -13,7 +15,7 @@ export default async function DashboardPage() {
   const session = await auth();
   await dbConnect();
 
-  const [userDoc, recentGrievances, counts] = await Promise.all([
+  const [userDoc, recentGrievances, counts, announcements, notifications] = await Promise.all([
     User.findById(session.user.userId).lean(),
     Grievance.find({ userId: session.user.userId })
       .sort({ createdAt: -1 })
@@ -23,6 +25,8 @@ export default async function DashboardPage() {
       { $match: { userId: require('mongoose').Types.ObjectId.createFromHexString(session.user.userId) } },
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]),
+    Announcement.find().sort({ createdAt: -1 }).limit(3).lean(),
+    Notification.find({ userId: session.user.userId, isRead: false }).sort({ createdAt: -1 }).limit(5).lean(),
   ]);
 
   // Next.js Server-to-Client Component Serialization fix
@@ -64,6 +68,55 @@ export default async function DashboardPage() {
         </h2>
         <MembershipCard user={user} />
       </section>
+
+      <div className="grid md:grid-cols-2 gap-8 mb-8">
+        {/* Notifications */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Bell size={18} className="text-[#FFD700]" />
+            <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider">
+              🔔 Notifications
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {notifications.length === 0 ? (
+              <p className="text-white/30 text-xs glass-card p-4 rounded-xl">No new notifications</p>
+            ) : (
+              notifications.map((n) => (
+                <div key={n._id.toString()} className="glass-card p-4 rounded-xl border-l-2 border-blue-500">
+                  <p className="text-white font-bold text-sm">{n.title}</p>
+                  <p className="text-white/60 text-xs mt-1">{n.message}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Announcements */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Megaphone size={18} className="text-[#FFD700]" />
+            <h2 className="text-white/70 text-sm font-semibold uppercase tracking-wider">
+              📢 Announcements
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {announcements.length === 0 ? (
+              <p className="text-white/30 text-xs glass-card p-4 rounded-xl">No announcements</p>
+            ) : (
+              announcements.map((a) => (
+                <div key={a._id.toString()} className="glass-card p-4 rounded-xl border-l-2 border-[#800000]">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[#FFD700] font-bold text-sm">{a.title}</p>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#800000]/30 text-white/50">{a.type}</span>
+                  </div>
+                  <p className="text-white/60 text-xs line-clamp-2">{a.content}</p>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
 
       {/* Stats */}
       <section className="mb-8">

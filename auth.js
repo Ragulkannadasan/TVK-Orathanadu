@@ -35,6 +35,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // Find or create user
         let user = await User.findOne({ email: credentials.email.toLowerCase() });
+        
+        if (user && user.isBlocked) {
+          throw new Error('Your account has been blocked. Please contact support.');
+        }
+
         if (!user) {
           user = await User.create({
             email: credentials.email.toLowerCase(),

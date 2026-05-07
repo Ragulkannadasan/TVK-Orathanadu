@@ -38,15 +38,42 @@ export default function AdminPage() {
   const categoryBarData = stats.categoryBreakdown.map((c) => ({ name: c._id, count: c.count }));
   const roleData = stats.roleBreakdown.map((r) => ({ name: r._id, count: r.count }));
 
+  const [announcementModal, setAnnouncementModal] = useState(false);
+  const [annData, setAnnData] = useState({ title: '', content: '', type: 'General' });
+
+  const handlePostAnnouncement = async () => {
+    if (!annData.title || !annData.content) return;
+    try {
+      await fetch('/api/admin/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(annData),
+      });
+      setAnnouncementModal(false);
+      setAnnData({ title: '', content: '', type: 'General' });
+      alert('Announcement posted!');
+    } catch (err) {
+      alert('Failed to post announcement');
+    }
+  };
+
   return (
     <div className="p-6 md:p-8 max-w-6xl">
       {/* Header */}
-      <div className="mb-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-400 text-xs mb-3">
-          🛡️ Admin Portal
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-400 text-xs mb-3">
+            🛡️ Admin Portal
+          </div>
+          <h1 className="text-3xl font-bold text-white">Constituency Analytics</h1>
+          <p className="tamil text-[#FFD700]/60 text-sm mt-1">ஓரத்தநாடு தொகுதி பகுப்பாய்வு</p>
         </div>
-        <h1 className="text-3xl font-bold text-white">Constituency Analytics</h1>
-        <p className="tamil text-[#FFD700]/60 text-sm mt-1">ஓரத்தநாடு தொகுதி பகுப்பாய்வு</p>
+        <button
+          onClick={() => setAnnouncementModal(true)}
+          className="btn-primary flex items-center gap-2 self-start"
+        >
+          📣 Post Announcement
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -138,6 +165,65 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {/* Announcement Modal */}
+      {announcementModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="glass rounded-2xl p-6 w-full max-w-md border border-white/10 animate-fade-in-up">
+            <h3 className="text-white font-bold text-lg mb-4">Post Announcement</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Title</label>
+                <input
+                  type="text"
+                  value={annData.title}
+                  onChange={(e) => setAnnData({ ...annData, title: e.target.value })}
+                  placeholder="Announcement title"
+                  className="input-dark"
+                />
+              </div>
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Type</label>
+                <select
+                  value={annData.type}
+                  onChange={(e) => setAnnData({ ...annData, type: e.target.value })}
+                  className="input-dark"
+                >
+                  <option value="General">General</option>
+                  <option value="Urgent">Urgent</option>
+                  <option value="Event">Event</option>
+                  <option value="Update">Update</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-white/70 text-sm mb-1">Content</label>
+                <textarea
+                  value={annData.content}
+                  onChange={(e) => setAnnData({ ...annData, content: e.target.value })}
+                  placeholder="Enter announcement content..."
+                  rows={4}
+                  className="input-dark resize-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setAnnouncementModal(false)}
+                  className="btn-secondary flex-1 py-2 rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePostAnnouncement}
+                  disabled={!annData.title || !annData.content}
+                  className="btn-primary flex-[2] py-2 rounded-xl disabled:opacity-50"
+                >
+                  Post Announcement
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
