@@ -46,9 +46,14 @@ export default function ProfileSetupPage() {
         body: JSON.stringify({ ...form, boothNumber: parseInt(form.boothNumber) || null }),
       });
       if (!res.ok) throw new Error('Failed to update profile');
+      
+      // Update session to reflect profileComplete: true
+      await update();
+      
       setStep(3); // Success
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
+        router.refresh();
       }, 2000);
     } catch (err) {
       setError(err.message || 'Something went wrong.');
