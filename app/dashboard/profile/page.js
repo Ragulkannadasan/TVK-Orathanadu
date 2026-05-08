@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { User, Phone, CreditCard, MapPin, Hash, Loader2, CheckCircle, Edit3, LogOut, Trash2 } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import { getUserProfileAction, updateProfileAction, deleteAccountAction } from '@/app/profile-setup/actions';
 import MembershipCard from '@/components/MembershipCard';
 
 const panchayats = [
@@ -30,8 +31,8 @@ export default function ProfilePage() {
 
     setDeleting(true);
     try {
-      const res = await fetch('/api/profile', { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete account');
+      const res = await deleteAccountAction();
+      if (res.error) throw new Error(res.error);
       await signOut({ callbackUrl: '/' });
     } catch (err) {
       setError(err.message);
@@ -40,12 +41,13 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    fetch('/api/profile')
-      .then((r) => r.json())
+    getUserProfileAction()
       .then((data) => {
+        if (data.error) throw new Error(data.error);
         setUser(data);
         setForm(data);
       })
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -54,15 +56,11 @@ export default function ProfilePage() {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, boothNumber: parseInt(form.boothNumber) || null }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
-      const data = await res.json();
-      setUser(data.user);
-      setForm(data.user);
+      const result = await updateProfileAction(form);
+      if (result.error) throw new Error(result.error);
+      
+      setUser(result.user);
+      setForm(result.user);
       await update();
       setSuccess(true);
       setEditing(false);

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { adminLoginAction } from './actions';
 import { useRouter } from 'next/navigation';
 import { Shield, Loader2, ArrowRight, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
@@ -22,21 +22,13 @@ export default function AdminLoginPage() {
     setError('');
     
     try {
-      const res = await signIn('admin-login', {
-        email: form.email,
-        password: form.password,
-        redirect: false,
-      });
-
-      if (res?.error) {
-        setError('Invalid admin credentials. Access Denied.');
-      } else {
-        router.push('/admin');
-        router.refresh();
+      const result = await adminLoginAction(form.email, form.password);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
       }
     } catch (err) {
       setError('An unexpected error occurred.');
-    } finally {
       setLoading(false);
     }
   };

@@ -1,6 +1,6 @@
 'use client';
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
+import { signupLoginAction } from './actions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, ArrowRight, Loader2, KeyRound } from 'lucide-react';
@@ -39,30 +39,15 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
     try {
-      const res = await signIn('credentials', {
-        email,
-        otp,
-        redirect: false,
-      });
-      
-      if (res?.error) {
-        setError(res.error.replace('Error: ', ''));
-        return;
+      const result = await signupLoginAction(email, otp);
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
       }
-
-      const sessionRes = await fetch('/api/auth/session');
-      const session = await sessionRes.json();
-      
-      if (session?.user?.profileComplete) {
-        router.push('/dashboard');
-      } else {
-        router.push('/profile-setup');
-      }
-      router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
-    } finally {
       setLoading(false);
     }
   };

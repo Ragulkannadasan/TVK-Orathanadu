@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { updateProfileAction } from './actions';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { User, Phone, CreditCard, MapPin, Hash, Loader2, CheckCircle } from 'lucide-react';
@@ -41,12 +42,8 @@ export default function ProfileSetupPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, boothNumber: parseInt(form.boothNumber) || null }),
-      });
-      if (!res.ok) throw new Error('Failed to update profile');
+      const result = await updateProfileAction(form);
+      if (result.error) throw new Error(result.error);
       
       // Update session to reflect profileComplete: true
       await update();

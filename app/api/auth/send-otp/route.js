@@ -19,8 +19,9 @@ export async function POST(req) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     // Update or create the OTP for this email
+    const normalizedEmail = email.toLowerCase().trim();
     await Otp.findOneAndUpdate(
-      { email: email.toLowerCase() },
+      { email: normalizedEmail },
       { otp, expiresAt },
       { upsert: true, returnDocument: 'after' }
     );

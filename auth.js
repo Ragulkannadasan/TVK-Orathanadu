@@ -1,104 +1,127 @@
 import NextAuth from 'next-auth';
-import { authConfig } from './auth.config';
+import Credentials from 'next-auth/providers/credentials';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import Otp from '@/models/Otp';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  ...authConfig,
   providers: [
-    ...authConfig.providers.map(p => {
-      if (p.name === 'OTP') {
+    Credentials({
+      id: 'otp',
+      name: 'OTP',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        otp: { label: "OTP", type: "text" }
+      },
+      async authorize(credentials) {
+        console.log(`[AUTH] Authorize called for: ${credentials?.email}`);
+        if (!credentials?.email || !credentials?.otp) return null;
+        
+        await dbConnect();
+        const email = credentials.email.toLowerCase().trim();
+        const otp = String(credentials.otp).trim();
+
+        // Find valid OTP
+        const validOtp = await Otp.findOne({
+          email,
+          otp,
+          expiresAt: { $gt: new Date() }
+        });
+
+        if (!validOtp) {
+          console.log(`[AUTH] OTP mismatch or expired for ${email}. Provided: ${otp}`);
+          return null;
+        }
+
+        console.log(`[AUTH] OTP valid for ${email}`);
+
+        // Delete used OTP
+        await Otp.deleteOne({ _id: validOtp._id });
+
+        // Get or Create User
+        let user = await User.findOne({ email });
+        
+        if (user && user.isBlocked) {
+          console.log(`[AUTH] User ${email} is blocked`);
+          return null;
+        }
+
+        if (!user) {
+          console.log(`[AUTH] Creating new user for ${email}`);
+          user = await User.create({
+            email,
+            name: '',
+            emailVerified: new Date(),
+            role: 'Voter',
+          });
+        } else if (!user.emailVerified) {
+          user.emailVerified = new Date();
+          await user.save();
+        }
+
+        console.log(`[AUTH] Login successful for ${email}`);
+
         return {
-          ...p,
-          async authorize(credentials) {
-            if (!credentials?.email || !credentials?.otp) {
-              throw new Error('Email and OTP are required');
-            }
-            await dbConnect();
-            const validOtp = await Otp.findOne({
-              email: credentials.email.toLowerCase(),
-              otp: credentials.otp,
-              expiresAt: { $gt: new Date() }
+          id: user._id.toString(),
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          profileComplete: !!(user.mobile && user.voterId && user.panchayat)
+        };
+      }
+    }),
+    Credentials({
+      id: 'admin-login',
+      name: 'Admin',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+        
+        const email = credentials.email.toLowerCase().trim();
+        const password = credentials.password;
+
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+          await dbConnect();
+          let user = await User.findOne({ email });
+          
+          if (!user) {
+            user = await User.create({
+              email,
+              name: 'Super Admin',
+              role: 'Admin',
+              emailVerified: new Date(),
+              mobile: '0000000000',
+              voterId: 'MASTER_ADMIN',
+              panchayat: 'Headquarters',
             });
-            if (!validOtp) throw new Error('Invalid or expired OTP');
-            await Otp.deleteOne({ _id: validOtp._id });
-            let user = await User.findOne({ email: credentials.email.toLowerCase() });
-            if (user && user.isBlocked) {
-              throw new Error('Your account has been blocked. Please contact support.');
-            }
-            if (!user) {
-              user = await User.create({
-                email: credentials.email.toLowerCase(),
-                name: '',
-                emailVerified: new Date(),
-                role: 'Voter',
-              });
-            } else if (!user.emailVerified) {
-              user.emailVerified = new Date();
-              await user.save();
-            }
-            return {
-              id: user._id.toString(),
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              profileComplete: !!(user.mobile && user.voterId && user.panchayat)
-            };
           }
-        };
+          
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name,
+            role: 'Admin',
+            profileComplete: true,
+          };
+        }
+        return null;
       }
-      if (p.id === 'admin-login') {
-        return {
-          ...p,
-          async authorize(credentials) {
-            if (!credentials?.email || !credentials?.password) {
-              throw new Error('Email and password are required');
-            }
-            if (
-              credentials.email === process.env.ADMIN_EMAIL &&
-              credentials.password === process.env.ADMIN_PASSWORD
-            ) {
-              await dbConnect();
-              let user = await User.findOne({ email: credentials.email.toLowerCase() });
-              if (!user) {
-                user = await User.create({
-                  email: credentials.email.toLowerCase(),
-                  name: 'Super Admin',
-                  role: 'Admin',
-                  emailVerified: new Date(),
-                  mobile: '0000000000',
-                  voterId: 'MASTER_ADMIN',
-                  panchayat: 'Headquarters',
-                });
-              } else if (user.role !== 'Admin') {
-                user.role = 'Admin';
-                await user.save();
-              }
-              return {
-                id: user._id.toString(),
-                email: user.email,
-                name: user.name,
-                role: 'Admin',
-                profileComplete: true,
-              };
-            }
-            throw new Error('Invalid admin credentials');
-          }
-        };
-      }
-      return p;
     })
   ],
   callbacks: {
-    ...authConfig.callbacks,
     async jwt({ token, user, trigger }) {
+      console.log(`[AUTH] JWT Callback - Trigger: ${trigger}, User present: ${!!user}`);
       if (user) {
         token.role = user.role;
         token.userId = user.id;
         token.profileComplete = user.profileComplete;
+        console.log(`[AUTH] JWT User Data Injected: ${user.email}`);
       }
       if (trigger === 'update' && token.userId) {
+        console.log(`[AUTH] JWT Update triggered for ${token.userId}`);
         await dbConnect();
         const dbUser = await User.findById(token.userId).lean();
         if (dbUser) {
@@ -108,5 +131,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
-  }
+    async session({ session, token }) {
+      console.log(`[AUTH] Session Callback - Token present: ${!!token}`);
+      if (token) {
+        session.user.role = token.role;
+        session.user.userId = token.userId;
+        session.user.profileComplete = token.profileComplete;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: '/login',
+    error: '/login',
+  },
+  session: { strategy: 'jwt' },
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
 });
