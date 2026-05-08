@@ -1,0 +1,20 @@
+[
+  {
+    "email": "admin@tvk.com",
+    "password": "adminpassword123",
+    "role": "Admin",
+    "name": "TVK Admin"
+  },
+  {
+    "email": "leader@tvk.com",
+    "password": "leaderpassword123",
+    "role": "Poruppalar",
+    "name": "TVK Leader"
+  },
+  {
+    "email": "voter@tvk.com",
+    "password": "voterpassword123",
+    "role": "Voter",
+    "name": "TVK Voter"
+  }
+]
