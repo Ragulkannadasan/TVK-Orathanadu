@@ -11,7 +11,7 @@ export const metadata = {
   keywords: 'TVK, Thamizhaga Vetri Kazhagam, Orathanadu, Tamil Nadu, voter enrollment, grievance',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'TVK 175',
   },
 };
@@ -19,7 +19,7 @@ export const metadata = {
 
 
 export const viewport = {
-  themeColor: '#800000',
+  themeColor: '#000000',
   width: 'device-width',
   initialScale: 1,
 };
