@@ -4,6 +4,8 @@ import { useActionState, useState, useRef } from "react";
 import { updateProfileAction } from "@/actions/profile";
 import { Camera, Upload } from "lucide-react";
 
+import { PANCHAYATS } from "@/lib/constants";
+
 export default function ProfileForm({ user }) {
   const [state, action, isPending] = useActionState(updateProfileAction, null);
   const [imagePreview, setImagePreview] = useState(user.image || "");
@@ -12,13 +14,38 @@ export default function ProfileForm({ user }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Image too large. Please select a file under 2MB.");
-        return;
-      }
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Create canvas for resizing
+          const canvas = document.createElement("canvas");
+          const MAX_SIZE = 400; // Max width/height
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width;
+              width = MAX_SIZE;
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height;
+              height = MAX_SIZE;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to compressed JPEG base64
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+          setImagePreview(compressedDataUrl);
+        };
+        img.src = event.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -121,11 +148,9 @@ export default function ProfileForm({ user }) {
             <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Panchayat</label>
             <select name="panchayat" defaultValue={user.panchayat} className="input-dark bg-black/40">
               <option value="">Select Panchayat</option>
-              <option value="Orathanadu">Orathanadu</option>
-              <option value="Kavarappattu">Kavarappattu</option>
-              <option value="Vaduvoor">Vaduvoor</option>
-              <option value="Mandalakkottai">Mandalakkottai</option>
-              <option value="Thekkur">Thekkur</option>
+              {PANCHAYATS.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
           </div>
 
