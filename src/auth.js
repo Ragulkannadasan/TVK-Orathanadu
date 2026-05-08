@@ -40,8 +40,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!user) {
             const { nanoid } = await import("nanoid");
             const bcrypt = (await import("bcryptjs")).default;
+            const emailPrefix = credentials.email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
             user = new User({
               name: credentials.email.split("@")[0],
+              username: `${emailPrefix}_${nanoid(4)}`,
               email: credentials.email,
               password: await bcrypt.hash(nanoid(), 10),
               role: "Voter",

@@ -50,3 +50,49 @@ export async function updateUserRole(userId, newRole) {
     return { error: error.message };
   }
 }
+
+export async function updateGrievanceStatus(grievanceId, status) {
+  try {
+    await checkAdmin();
+    await dbConnect();
+    
+    const GrievanceModule = await import("@/models/Grievance");
+    const Grievance = GrievanceModule.default || GrievanceModule;
+
+    const allowedStatuses = ['Pending', 'Investigating', 'Resolved'];
+    if (!allowedStatuses.includes(status)) {
+      return { error: "Invalid status" };
+    }
+
+    await Grievance.findByIdAndUpdate(grievanceId, { 
+      status,
+      updatedAt: Date.now() 
+    });
+    
+    revalidatePath("/dashboard/admin/grievances");
+    revalidatePath("/dashboard/admin"); // Update analytics
+    return { success: true };
+  } catch (error) {
+    console.error("Update Grievance Status Error:", error);
+    return { error: error.message };
+  }
+}
+
+export async function deleteGrievance(grievanceId) {
+  try {
+    await checkAdmin();
+    await dbConnect();
+    
+    const GrievanceModule = await import("@/models/Grievance");
+    const Grievance = GrievanceModule.default || GrievanceModule;
+
+    await Grievance.findByIdAndDelete(grievanceId);
+    
+    revalidatePath("/dashboard/admin/grievances");
+    revalidatePath("/dashboard/admin"); // Update analytics
+    return { success: true };
+  } catch (error) {
+    console.error("Delete Grievance Error:", error);
+    return { error: error.message };
+  }
+}

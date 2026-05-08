@@ -10,13 +10,26 @@ export async function updateProfileAction(prevState, formData) {
   const panchayat = formData.get("panchayat");
   const boothNumber = formData.get("boothNumber");
   const image = formData.get("image");
+  const username = formData.get("username")?.toLowerCase().replace(/[^a-z0-9_.]/g, "");
 
   if (!userId) return { error: "User ID missing" };
 
   await dbConnect();
 
   try {
+    // Check if username is taken
+    if (username) {
+      const existingUser = await User.findOne({ 
+        username, 
+        _id: { $ne: userId } 
+      });
+      if (existingUser) {
+        return { error: "Username is already taken" };
+      }
+    }
+
     await User.findByIdAndUpdate(userId, {
+      username,
       mobile,
       voterId,
       panchayat,

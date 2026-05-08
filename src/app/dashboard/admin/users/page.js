@@ -1,9 +1,11 @@
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import UserTable from "./user-table";
+import { auth } from "@/auth";
 
 export default async function AdminUsersPage() {
   await dbConnect();
+  const session = await auth();
   const users = await User.find({}).sort({ createdAt: -1 }).lean();
   
   // Serialize Mongo IDs
@@ -28,7 +30,10 @@ export default async function AdminUsersPage() {
         </div>
       </div>
 
-      <UserTable initialUsers={serializedUsers} />
+      <UserTable 
+        initialUsers={serializedUsers} 
+        currentUserEmail={session?.user?.email} 
+      />
     </div>
   );
 }

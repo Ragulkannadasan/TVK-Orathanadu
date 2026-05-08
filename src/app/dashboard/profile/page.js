@@ -43,16 +43,22 @@ export default async function ProfilePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
-            <div className="glass-card p-6 text-center">
-               <div className="w-20 h-20 rounded-full bg-[#800000]/20 border-2 border-[#FFD700]/30 flex items-center justify-center text-[#FFD700] text-3xl font-bold mx-auto mb-4 overflow-hidden">
-                 {user.image ? (
-                   <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-                 ) : (
-                   user.name[0]
-                 )}
+            <div className="glass-card p-6 text-center relative overflow-hidden">
+               {/* Instagram-style Ring */}
+               <div className="relative w-24 h-24 mx-auto mb-4 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] animate-spin-slow">
+                  <div className="w-full h-full rounded-full bg-black p-0.5">
+                     <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-white/10">
+                        {user.image ? (
+                           <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                           <span className="text-2xl font-bold text-[#FFD700]">{user.name[0]}</span>
+                        )}
+                     </div>
+                  </div>
                </div>
-               <h3 className="text-white font-bold text-lg">{user.name}</h3>
-              <p className="text-white/40 text-xs mt-1">{user.email}</p>
+               <h3 className="text-white font-bold text-lg leading-tight">{user.name}</h3>
+               <p className="text-[#FFD700] text-xs font-bold mb-1">@{user.username || user.email.split('@')[0]}</p>
+               <p className="text-white/40 text-[10px] truncate mb-4">{user.email}</p>
               <div className="mt-4 px-3 py-1 rounded-full bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest inline-block border border-[#FFD700]/20">
                 {user.role}
               </div>

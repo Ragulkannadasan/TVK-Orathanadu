@@ -5,6 +5,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a name'],
   },
+  username: {
+    type: String,
+    unique: true,
+    sparse: true, // Allow nulls for old users but must be unique if present
+  },
   email: {
     type: String,
     required: [true, 'Please provide an email'],
