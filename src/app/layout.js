@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 
 export const metadata = {
-  title: 'TVK Orathanadu – தமிழக வெற்றி கழகம் | ஓரத்தநாடு தொகுதி 175',
+  title: 'TVK Orathanadu – தமிழக வெற்றி கழகம் | ஒரத்தநாடு தொகுதி 175',
   description:
     'Thamizhaga Vetri Kazhagam – Orathanadu Assembly Constituency 175. Digital voter enrollment, grievance redressal, and booth-level management for TVK members.',
   keywords: 'TVK, Thamizhaga Vetri Kazhagam, Orathanadu, Tamil Nadu, voter enrollment, grievance',

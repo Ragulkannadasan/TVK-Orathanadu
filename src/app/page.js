@@ -41,7 +41,7 @@ export default async function LandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#800000]/20 border border-[#800000]/40 text-[#FFD700] text-sm mb-8 animate-fade-in-up">
             <span className="w-2 h-2 rounded-full bg-[#FFD700] animate-pulse" />
-            ஓரத்தநாடு சட்டமன்றத் தொகுதி – 175
+            ஒரத்தநாடு சட்டமன்றத் தொகுதி – 175
           </div>
 
           {/* Main title */}
@@ -106,7 +106,7 @@ export default async function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/10 py-8 px-4 text-center">
         <p className="tamil text-[#FFD700] font-semibold">தமிழக வெற்றி கழகம்</p>
-        <p className="text-white/40 text-sm mt-1">ஓரத்தநாடு சட்டமன்றத் தொகுதி – 175</p>
+        <p className="text-white/40 text-sm mt-1">ஒரத்தநாடு சட்டமன்றத் தொகுதி – 175</p>
         <p className="text-white/20 text-xs mt-3">© 2026 TVK Orathanadu. All rights reserved.</p>
       </footer>
     </main>
