@@ -47,8 +47,8 @@ export default function TopLoader() {
   if (!loading) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-[3px] overflow-hidden bg-transparent">
-      <div className="h-full bg-gradient-to-r from-[#FFD700] via-[#800000] to-[#FFD700] animate-progress shadow-[0_0_15px_#FFD700]" />
+    <div className="fixed top-0 left-0 right-0 z-[9999] h-[2px] overflow-hidden bg-transparent">
+      <div className="h-full bg-gradient-to-r from-[#FFD700] via-black to-[#FFD700] animate-progress shadow-[0_0_10px_#FFD700]" />
       <style jsx>{`
         @keyframes progress {
           0% { transform: translateX(-100%); }
