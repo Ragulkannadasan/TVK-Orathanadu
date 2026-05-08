@@ -17,12 +17,10 @@ export default function LoginPage() {
 
         <OTPLoginForm />
 
-        <div className="text-center text-sm text-white/50">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-[#FFD700] hover:underline">
-            Sign Up
-          </Link>
+        <div className="text-center text-xs text-white/30 italic tamil">
+          புதிய பயனர்கள் மின்னஞ்சல் மூலம் நேரடியாக சேரலாம்
         </div>
+
       </div>
     </main>
   );

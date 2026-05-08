@@ -7,38 +7,6 @@ import { sendEmail } from "@/lib/mailer";
 import bcrypt from "bcryptjs";
 import { signIn } from "@/auth";
 
-export async function signUpAction(prevState, formData) {
-  const name = formData.get("name");
-  const email = formData.get("email");
-  const password = formData.get("password");
-
-  if (!name || !email || !password) {
-    return { error: "All fields are required" };
-  }
-
-  await dbConnect();
-
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return { error: "Email already registered" };
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newUser = new User({
-    name,
-    email,
-    password: hashedPassword,
-    role: "Voter", // Default role
-  });
-
-  try {
-    await newUser.save();
-    return { success: "User registered successfully! You can now log in." };
-  } catch (err) {
-    return { error: "Something went wrong during registration" };
-  }
-}
 
 export async function loginAction(prevState, formData) {
   const email = formData.get("email");
