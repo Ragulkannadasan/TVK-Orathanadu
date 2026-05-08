@@ -1,7 +1,12 @@
-import Link from 'next/link';
+"use client";
+
+import { useState } from 'react';
 import OTPLoginForm from './otp-form';
+import LoginForm from './login-form';
 
 export default function LoginPage() {
+  const [mode, setMode] = useState('otp'); // 'otp' or 'password'
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden -z-10">
@@ -11,14 +16,27 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md glass-card p-8 space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold display-font gradient-text">Access Portal</h1>
-          <p className="tamil text-[#FFD700]/70 text-sm mt-2">மின்னஞ்சல் மூலம் உள்நுழையவும்</p>
+          <h1 className="text-3xl font-bold display-font gradient-text">
+            {mode === 'otp' ? 'Access Portal' : 'Admin Login'}
+          </h1>
+          <p className="tamil text-[#FFD700]/70 text-sm mt-2">
+            {mode === 'otp' ? 'மின்னஞ்சல் மூலம் உள்நுழையவும்' : 'நிர்வாகி உள்நுழைவு'}
+          </p>
         </div>
 
-        <OTPLoginForm />
+        {mode === 'otp' ? <OTPLoginForm /> : <LoginForm />}
 
-        <div className="text-center text-xs text-white/30 italic tamil">
-          புதிய பயனர்கள் மின்னஞ்சல் மூலம் நேரடியாக சேரலாம்
+        <div className="text-center space-y-4">
+          <button 
+            onClick={() => setMode(mode === 'otp' ? 'password' : 'otp')}
+            className="text-[#FFD700] text-sm hover:underline"
+          >
+            {mode === 'otp' ? 'Use Admin Password →' : '← Back to OTP Login'}
+          </button>
+          
+          <div className="text-center text-xs text-white/30 italic tamil">
+            {mode === 'otp' ? 'புதிய பயனர்கள் மின்னஞ்சல் மூலம் நேரடியாக சேரலாம்' : 'நிர்வாக சான்றுகளைப் பயன்படுத்தவும்'}
+          </div>
         </div>
 
       </div>

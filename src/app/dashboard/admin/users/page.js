@@ -1,24 +1,34 @@
-export default function AdminUsersPage() {
+import dbConnect from "@/lib/db";
+import User from "@/models/User";
+import UserTable from "./user-table";
+
+export default async function AdminUsersPage() {
+  await dbConnect();
+  const users = await User.find({}).sort({ createdAt: -1 }).lean();
+  
+  // Serialize Mongo IDs
+  const serializedUsers = JSON.parse(JSON.stringify(users));
+
   return (
-    <div className="p-4 md:p-6 max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white display-font mb-1">
-          User <span className="gradient-text">Management</span>
-        </h1>
-        <p className="text-white/60 text-sm md:text-base mt-2">
-          Manage all registered members and roles
-        </p>
+    <div className="p-4 md:p-6 max-w-6xl mx-auto">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-white display-font mb-1">
+            User <span className="gradient-text">Management</span>
+          </h1>
+          <p className="text-white/60 text-sm md:text-base mt-2">
+            Manage all registered members, assign roles, and verify status.
+          </p>
+        </div>
+        <div className="flex gap-4 text-xs">
+          <div className="px-3 py-2 rounded-xl glass-card border-white/5">
+            <span className="text-white/40">Total Members:</span>
+            <span className="ml-2 text-white font-bold">{users.length}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="glass-card p-8 text-center">
-        <div className="w-16 h-16 bg-[#800000]/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#FFD700]/30">
-          <span className="text-2xl">👥</span>
-        </div>
-        <h2 className="text-white font-bold text-xl mb-4">Member Directory</h2>
-        <p className="text-white/50 max-w-md mx-auto">
-          Administrative control for user roles, booth assignments, and membership verification will be available here soon.
-        </p>
-      </div>
+      <UserTable initialUsers={serializedUsers} />
     </div>
   );
 }

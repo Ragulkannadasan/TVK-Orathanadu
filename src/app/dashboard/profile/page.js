@@ -43,11 +43,15 @@ export default async function ProfilePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
-           <div className="glass-card p-6 text-center">
-              <div className="w-20 h-20 rounded-full bg-[#800000]/20 border-2 border-[#FFD700]/30 flex items-center justify-center text-[#FFD700] text-3xl font-bold mx-auto mb-4">
-                {user.name[0]}
-              </div>
-              <h3 className="text-white font-bold text-lg">{user.name}</h3>
+            <div className="glass-card p-6 text-center">
+               <div className="w-20 h-20 rounded-full bg-[#800000]/20 border-2 border-[#FFD700]/30 flex items-center justify-center text-[#FFD700] text-3xl font-bold mx-auto mb-4 overflow-hidden">
+                 {user.image ? (
+                   <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                 ) : (
+                   user.name[0]
+                 )}
+               </div>
+               <h3 className="text-white font-bold text-lg">{user.name}</h3>
               <p className="text-white/40 text-xs mt-1">{user.email}</p>
               <div className="mt-4 px-3 py-1 rounded-full bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest inline-block border border-[#FFD700]/20">
                 {user.role}

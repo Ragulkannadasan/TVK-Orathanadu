@@ -9,6 +9,7 @@ export async function updateProfileAction(prevState, formData) {
   const voterId = formData.get("voterId");
   const panchayat = formData.get("panchayat");
   const boothNumber = formData.get("boothNumber");
+  const image = formData.get("image");
 
   if (!userId) return { error: "User ID missing" };
 
@@ -20,9 +21,11 @@ export async function updateProfileAction(prevState, formData) {
       voterId,
       panchayat,
       boothNumber,
+      image,
       isProfileComplete: true,
     });
     revalidatePath("/dashboard");
+    revalidatePath("/dashboard/profile");
     return { success: "Profile updated successfully!" };
   } catch (error) {
     return { error: "Failed to update profile" };

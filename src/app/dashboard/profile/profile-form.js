@@ -1,14 +1,73 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useRef } from "react";
 import { updateProfileAction } from "@/actions/profile";
+import { Camera, Upload } from "lucide-react";
 
 export default function ProfileForm({ user }) {
   const [state, action, isPending] = useActionState(updateProfileAction, null);
+  const [imagePreview, setImagePreview] = useState(user.image || "");
+  const fileInputRef = useRef(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image too large. Please select a file under 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="userId" value={user._id} />
+      <input type="hidden" name="image" value={imagePreview} />
+
+      {/* Profile Photo Section */}
+      <div className="flex flex-col items-center sm:items-start gap-4 mb-8 pb-8 border-b border-white/5">
+        <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Profile Photo</label>
+        <div className="flex items-center gap-6">
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-2xl bg-[#800000]/10 border-2 border-white/10 overflow-hidden flex items-center justify-center">
+              {imagePreview ? (
+                <img src={imagePreview} alt="Profile Preview" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white/20 text-4xl font-bold">{user.name[0]}</span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current.click()}
+              className="absolute -bottom-2 -right-2 p-2 bg-[#FFD700] rounded-xl text-black hover:scale-110 transition-transform shadow-lg"
+            >
+              <Camera size={16} strokeWidth={3} />
+            </button>
+          </div>
+          <div className="flex-1">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current.click()}
+              className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold hover:bg-white/10 transition-colors flex items-center gap-2"
+            >
+              <Upload size={14} /> Change Photo
+            </button>
+            <p className="text-[10px] text-white/30 mt-2">JPG or PNG. Max size 2MB.</p>
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+            accept="image/*"
+            className="hidden"
+          />
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="space-y-1">

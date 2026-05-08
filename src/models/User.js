@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['Voter', 'Poruppalar', 'Admin'],
+    enum: ['Voter', 'Poruppalar', 'Admin', 'MLA', 'DistSecretary'],
     default: 'Voter',
   },
   mobile: String,
@@ -27,6 +27,7 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  image: String,
   createdAt: {
     type: Date,
     default: Date.now,
