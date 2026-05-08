@@ -8,7 +8,7 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth');
-  const isPublicRoute = ['/', '/login'].includes(nextUrl.pathname);
+  const isPublicRoute = ['/', '/login', '/manifest.webmanifest', '/icon.png'].includes(nextUrl.pathname);
   const isAuthRoute = ['/login'].includes(nextUrl.pathname);
 
   if (isApiAuthRoute) return null;
@@ -44,5 +44,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.png).*)"],
 };

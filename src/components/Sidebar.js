@@ -1,40 +1,17 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { navItems } from "@/lib/nav";
+import InstallButton from "@/components/InstallButton";
 import {
-  LayoutDashboard,
-  FileText,
-  Users,
-  Settings,
-  LogOut,
   Shield,
   Star,
-  MessageSquare,
+  Users,
 } from "lucide-react";
 
-const navItems = {
-  Voter: [
-    { href: "/dashboard/voter", label: "Dashboard", labelTa: "டாஷ்போர்ட்", icon: LayoutDashboard },
-    { href: "/dashboard/grievances", label: "My Grievances", labelTa: "என் புகார்கள்", icon: FileText },
-    { href: "/dashboard/profile", label: "Profile", labelTa: "சுயவிவரம்", icon: Settings },
-    { href: "/dashboard/feedback", label: "Feedback", labelTa: "பின்னூட்டம்", icon: MessageSquare },
-  ],
-  Poruppalar: [
-    { href: "/dashboard/leader", label: "Dashboard", labelTa: "டாஷ்போர்ட்", icon: LayoutDashboard },
-    { href: "/dashboard/grievances/booth", label: "Booth Grievances", labelTa: "சாவடி புகார்கள்", icon: FileText },
-    { href: "/dashboard/profile", label: "Profile", labelTa: "சுயவிவரம்", icon: Settings },
-    { href: "/dashboard/feedback", label: "Feedback", labelTa: "பின்னூட்டம்", icon: MessageSquare },
-  ],
-  Admin: [
-    { href: "/dashboard/admin", label: "Analytics", labelTa: "பகுப்பாய்வு", icon: LayoutDashboard },
-    { href: "/dashboard/admin/users", label: "Users", labelTa: "பயனர்கள்", icon: Users },
-    { href: "/dashboard/admin/grievances", label: "All Grievances", labelTa: "அனைத்து புகார்கள்", icon: FileText },
-    { href: "/dashboard/profile", label: "Profile", labelTa: "சுயவிவரம்", icon: Settings },
-    { href: "/dashboard/feedback", label: "Feedback", labelTa: "பின்னூட்டம்", icon: MessageSquare },
-  ],
-};
+
 
 const roleColors = {
   Admin: { bg: "bg-purple-500/20", text: "text-purple-400", icon: Shield },
@@ -101,16 +78,10 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
       <div className="p-4 border-t border-white/10">
-        <button
-          onClick={() => signOut()}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
-        >
-          <LogOut size={18} />
-          <span className="text-sm font-medium">Logout</span>
-        </button>
+        <InstallButton />
       </div>
     </aside>
+
   );
 }

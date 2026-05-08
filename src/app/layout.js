@@ -7,7 +7,14 @@ export const metadata = {
   description:
     'Thamizhaga Vetri Kazhagam – Orathanadu Assembly Constituency 175. Digital voter enrollment, grievance redressal, and booth-level management for TVK members.',
   keywords: 'TVK, Thamizhaga Vetri Kazhagam, Orathanadu, Tamil Nadu, voter enrollment, grievance',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TVK 175',
+  },
 };
+
+
 
 export const viewport = {
   themeColor: '#800000',

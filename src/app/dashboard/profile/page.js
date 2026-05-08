@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
+import LogoutButton from "@/components/LogoutButton";
 import ProfileForm from "./profile-form";
 import { UserCircle, MapPin, Contact } from "lucide-react";
 
@@ -18,9 +19,10 @@ export default async function ProfilePage() {
     return (
       <div className="p-10 text-center">
         <h2 className="text-white font-bold text-xl mb-4">Local Auth Mode</h2>
-        <p className="text-white/50 max-w-md mx-auto">
+        <p className="text-white/50 max-w-md mx-auto mb-6">
           You are logged in via the local JSON file. Profile updates are only available for users registered in the MongoDB database.
         </p>
+        <LogoutButton className="max-w-xs mx-auto" />
       </div>
     );
   }
@@ -62,7 +64,10 @@ export default async function ProfilePage() {
                  <span className="text-xs font-medium">Booth: {user.boothNumber || "Not Set"}</span>
               </div>
            </div>
+
+           <LogoutButton />
         </div>
+
 
         <div className="md:col-span-2">
            <div className="glass-card p-8">
