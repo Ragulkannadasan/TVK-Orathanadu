@@ -26,7 +26,7 @@ export default async function RootLayout({ children }) {
   const session = await auth();
 
   return (
-    <html lang="ta">
+    <html lang="ta" data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

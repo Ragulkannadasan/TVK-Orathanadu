@@ -17,4 +17,6 @@ const MessageSchema = new mongoose.Schema({
   },
 });
 
+MessageSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Message || mongoose.model('Message', MessageSchema);

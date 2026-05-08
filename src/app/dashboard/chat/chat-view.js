@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { sendMessage, getMessages } from "@/actions/chat";
+import { sendMessage } from "@/actions/chat";
 import { Send, User as UserIcon, Shield, Star, Crown } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -19,16 +19,69 @@ export default function ChatView({ initialMessages }) {
     }
   }, [messages]);
 
-  // Polling for new messages every 5 seconds
+  // Real-time updates via SSE (Server-Sent Events)
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const latest = await getMessages(50);
-      if (JSON.stringify(latest) !== JSON.stringify(messages)) {
-        setMessages(latest);
+    let eventSource;
+
+    const setupSSE = () => {
+      if (document.visibilityState !== 'visible') return;
+      
+      if (eventSource) eventSource.close();
+      
+      eventSource = new EventSource('/api/chat/stream');
+      
+      eventSource.onmessage = (event) => {
+        // When a new message arrives via SSE, refresh the list
+        // We fetch the full list to ensure we have populated user data and correct order
+        fetchLatest();
+      };
+
+      eventSource.onerror = (err) => {
+        console.error("SSE Error:", err);
+        eventSource.close();
+      };
+    };
+
+    const fetchLatest = async () => {
+      try {
+        const response = await fetch('/api/chat/messages');
+        if (response.ok) {
+          const latest = await response.json();
+          setMessages(prev => {
+            if (latest.length > 0 && prev.length > 0) {
+              const latestId = latest[latest.length - 1]._id;
+              const prevId = prev[prev.length - 1]._id;
+              if (latestId === prevId) return prev;
+            }
+            return latest;
+          });
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
       }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [messages]);
+    };
+
+    // Initial setup
+    setupSSE();
+    const interval = setInterval(fetchLatest, 60000); // Slow fallback poll
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchLatest();
+        setupSSE();
+      } else {
+        if (eventSource) eventSource.close();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (eventSource) eventSource.close();
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -48,7 +101,8 @@ export default function ChatView({ initialMessages }) {
         name: session?.user?.name,
         username: session?.user?.email?.split('@')[0],
         role: session?.user?.role,
-        image: session?.user?.image
+        image: session?.user?.image,
+        email: session?.user?.email
       },
       isOptimistic: true
     };
@@ -60,9 +114,16 @@ export default function ChatView({ initialMessages }) {
       alert(res.error);
       setMessages(prev => prev.filter(m => m._id !== tempId));
     } else {
-      // Refresh messages to get the real ID and timestamp
-      const latest = await getMessages(50);
-      setMessages(latest);
+      // Refresh messages using GET API
+      try {
+        const response = await fetch('/api/chat/messages');
+        if (response.ok) {
+          const latest = await response.json();
+          setMessages(latest);
+        }
+      } catch (err) {
+        console.error("Refresh error:", err);
+      }
     }
     setIsSending(false);
   };
@@ -88,7 +149,7 @@ export default function ChatView({ initialMessages }) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-220px)] md:h-[calc(100vh-120px)] max-w-4xl mx-auto glass-card overflow-hidden border-white/5 shadow-2xl">
+    <div className="flex flex-col h-[calc(100vh-220px)] md:h-[calc(100vh-120px)] max-w-6xl mx-auto w-full glass-card overflow-hidden border-white/5 shadow-2xl">
       {/* Chat Header */}
       <div className="p-4 border-b border-white/5 bg-white/2 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -107,36 +168,42 @@ export default function ChatView({ initialMessages }) {
       >
         {messages.map((msg, i) => {
           const isMe = msg.userId?.email === session?.user?.email || (msg.isOptimistic && msg.userId?.name === session?.user?.name);
-          const showAvatar = i === 0 || messages[i-1].userId?._id !== msg.userId?._id;
+          const showAvatar = (i === 0 || messages[i-1].userId?._id !== msg.userId?._id) && !isMe;
 
           return (
-            <div key={msg._id} className={`flex gap-3 ${showAvatar ? 'mt-2' : '-mt-4'}`}>
-              {showAvatar ? (
-                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-white/10 bg-[#1a1a1a] flex items-center justify-center">
-                  {msg.userId?.image ? (
-                    <img src={msg.userId.image} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[10px] font-bold text-white/40">{msg.userId?.name?.[0]}</span>
-                  )}
+            <div key={msg._id} className={`flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 ${showAvatar ? 'mt-4' : 'mt-1'}`}>
+              {!isMe && (
+                <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-white/10 bg-[#1a1a1a] flex items-center justify-center mb-1">
+                  {showAvatar ? (
+                    msg.userId?.image ? (
+                      <img src={msg.userId.image} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[10px] font-bold text-white/40">{msg.userId?.name?.[0]}</span>
+                    )
+                  ) : null}
                 </div>
-              ) : (
-                <div className="w-8 shrink-0" />
               )}
               
-              <div className="flex-1 min-w-0">
-                {showAvatar && (
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`text-[10px] font-black uppercase tracking-tight ${getRoleColor(msg.userId?.role)}`}>
+              <div className={`flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}`}>
+                {!isMe && showAvatar && (
+                  <div className="flex items-center gap-2 mb-1 ml-1">
+                    <span className={`text-[9px] font-black uppercase tracking-tight ${getRoleColor(msg.userId?.role)}`}>
                       {msg.userId?.name}
                     </span>
                     {getRoleIcon(msg.userId?.role)}
-                    <span className="text-[8px] text-white/20 font-bold">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
                   </div>
                 )}
-                <div className={`text-sm text-white/80 leading-relaxed break-words ${msg.isOptimistic ? 'opacity-50' : ''}`}>
+                
+                <div className={`relative px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words shadow-lg
+                  ${isMe 
+                    ? 'bg-gradient-to-br from-[#800000] to-[#4a0000] text-white rounded-br-none border border-white/10' 
+                    : 'bg-white/5 text-white/80 rounded-bl-none border border-white/5'}
+                  ${msg.isOptimistic ? 'opacity-50' : ''}
+                `}>
                   {msg.text}
+                  <div className={`text-[8px] mt-1 font-bold uppercase tracking-widest opacity-30 ${isMe ? 'text-right' : 'text-left'}`}>
+                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
                 </div>
               </div>
             </div>

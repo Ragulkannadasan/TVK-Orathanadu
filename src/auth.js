@@ -57,6 +57,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: user.name,
             email: user.email,
             role: user.role,
+            image: user.image,
           };
         }
 
@@ -71,11 +72,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const localUser = localUsers.find(u => u.email === credentials.email && u.password === credentials.password);
 
         if (localUser) {
+          // Check DB for any overrides (like profile image)
+          let dbImage = localUser.image;
+          try {
+            const dbUser = await User.findOne({ email: localUser.email }).lean();
+            if (dbUser?.image) dbImage = dbUser.image;
+          } catch (e) {
+            console.error("Auth DB Error:", e);
+          }
+
+          console.log("Local User Auth Info:", { email: localUser.email, hasImage: !!dbImage });
+
           return {
             id: localUser.email,
             name: localUser.name,
             email: localUser.email,
             role: localUser.role,
+            image: dbImage,
           };
         }
 
@@ -91,6 +104,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               name: dbUser.name,
               email: dbUser.email,
               role: dbUser.role,
+              image: dbUser.image,
             };
           }
         }

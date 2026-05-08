@@ -31,61 +31,81 @@ export default async function ProfilePage() {
   user = JSON.parse(JSON.stringify(user));
 
   return (
-    <div className="p-4 md:p-6 max-w-4xl">
-      <div className="mb-8">
+    <div className="p-4 md:p-6 max-w-4xl mx-auto">
+      <div className="mb-10">
         <h1 className="text-4xl font-bold text-white display-font mb-1">
           Profile <span className="gradient-text">Settings</span>
         </h1>
-        <p className="text-white/60 text-sm md:text-base mt-2">
+        <p className="text-white/40 text-sm md:text-base">
           Manage your personal and voter information
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1 space-y-6">
-            <div className="glass-card p-6 text-center relative overflow-hidden">
-               {/* Instagram-style Ring */}
-               <div className="relative w-24 h-24 mx-auto mb-4 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] animate-spin-slow">
-                  <div className="w-full h-full rounded-full bg-black p-0.5">
-                     <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-white/10">
-                        {user.image ? (
-                           <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-                        ) : (
-                           <span className="text-2xl font-bold text-[#FFD700]">{user.name[0]}</span>
-                        )}
-                     </div>
-                  </div>
-               </div>
-               <h3 className="text-white font-bold text-lg leading-tight">{user.name}</h3>
-               <p className="text-[#FFD700] text-xs font-bold mb-1">@{user.username || user.email.split('@')[0]}</p>
-               <p className="text-white/40 text-[10px] truncate mb-4">{user.email}</p>
-              <div className="mt-4 px-3 py-1 rounded-full bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-bold uppercase tracking-widest inline-block border border-[#FFD700]/20">
-                {user.role}
+          <div className="glass-card p-6 text-center relative overflow-hidden">
+            {/* Profile Avatar Display */}
+            <div className="relative w-28 h-28 mx-auto mb-4 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] shadow-lg">
+              <div className="w-full h-full rounded-full bg-black p-0.5">
+                <div 
+                  className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-white/10"
+                  suppressHydrationWarning
+                >
+                  {user.image ? (
+                    <img 
+                      src={user.image} 
+                      alt={user.name} 
+                      className="w-full h-full object-cover"
+                      suppressHydrationWarning
+                    />
+                  ) : (
+                    <span className="text-3xl font-bold text-[#FFD700]">{user.name[0]}</span>
+                  )}
+                </div>
               </div>
-           </div>
-           
-           <div className="glass-card p-4 space-y-4">
-              <div className="flex items-center gap-3 text-white/70">
-                 <MapPin size={18} className="text-[#FFD700]" />
-                 <span className="text-xs font-medium">{user.panchayat || "No Panchayat Set"}</span>
+            </div>
+            <h3 className="text-white font-bold text-lg">{user.name}</h3>
+            <p className="text-[#FFD700] text-xs font-bold mb-1">@{user.username || user.email.split('@')[0]}</p>
+            <p className="text-white/40 text-[10px] truncate mb-4">{user.email}</p>
+            <div className="mt-4 px-4 py-1.5 rounded-full bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-black uppercase tracking-widest inline-block border border-[#FFD700]/20">
+              {user.role}
+            </div>
+          </div>
+          
+          <div className="glass-card p-5 space-y-5">
+            <div className="flex items-center gap-3 text-white/60">
+              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                <MapPin size={16} className="text-[#FFD700]" />
               </div>
-              <div className="flex items-center gap-3 text-white/70">
-                 <Contact size={18} className="text-[#FFD700]" />
-                 <span className="text-xs font-medium">Booth: {user.boothNumber || "Not Set"}</span>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-white/30 uppercase font-black">Panchayat</span>
+                <span className="text-xs font-bold text-white">{user.panchayat || "Not Set"}</span>
               </div>
-           </div>
+            </div>
+            <div className="flex items-center gap-3 text-white/60">
+              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+                <Contact size={16} className="text-[#FFD700]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-white/30 uppercase font-black">Booth Number</span>
+                <span className="text-xs font-bold text-white">{user.boothNumber || "Not Set"}</span>
+              </div>
+            </div>
+          </div>
 
-           <LogoutButton />
+          <LogoutButton />
         </div>
 
-
         <div className="md:col-span-2">
-           <div className="glass-card p-8">
-              <h3 className="text-white font-bold text-xl mb-6 flex items-center gap-2">
-                 <UserCircle className="text-[#FFD700]" /> Edit Profile
-              </h3>
-              <ProfileForm user={user} />
-           </div>
+          <div className="glass-card p-8 border-white/5">
+            <h3 className="text-white font-bold text-xl mb-8 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-[#FFD700]/10 border border-[#FFD700]/20 text-[#FFD700]">
+                <UserCircle size={20} />
+              </div>
+              Edit Account Profile
+            </h3>
+            <ProfileForm user={user} />
+          </div>
         </div>
       </div>
     </div>

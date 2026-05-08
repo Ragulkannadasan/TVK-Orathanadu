@@ -14,6 +14,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import Link from "next/link";
+import DatabaseManager from "./database-manager";
 
 export const metadata = { title: "Admin Analytics – TVK Orathanadu" };
 
@@ -244,6 +245,9 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
+        {/* Database Management Tools */}
+        <DatabaseManager />
+
         {/* Quick Links / Actions */}
         <div className="lg:col-span-1 flex flex-col gap-4">
            <Link href="/dashboard/admin/users" className="glass-card p-6 border-white/5 group hover:border-[#FFD700]/30 transition-all flex items-center justify-between">
@@ -260,17 +264,6 @@ export default async function AdminDashboard() {
               </div>
               <ChevronRight className="text-white/20 group-hover:text-red-500 transition-colors" />
            </Link>
-           <div className="glass-card p-6 border-[#FFD700]/10 bg-gradient-to-br from-[#800000]/20 to-transparent">
-              <h4 className="text-[#FFD700] font-black text-xs uppercase tracking-widest mb-3">System Integrity</h4>
-              <div className="flex items-center gap-2 mb-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                 <span className="text-white/60 text-[10px] font-bold">DB Status: Operational</span>
-              </div>
-              <div className="flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                 <span className="text-white/60 text-[10px] font-bold">Data Sync: Live Aggregate</span>
-              </div>
-           </div>
         </div>
       </div>
     </div>

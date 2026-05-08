@@ -9,7 +9,7 @@ export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const role = session?.user?.role || "Voter";
-  const items = navItems[role] || navItems.Voter;
+  const items = (navItems[role] || navItems.Voter).filter(item => item.href !== "/dashboard/notifications");
 
   return (
     <div className="md:hidden fixed bottom-4 left-3 right-3 z-50">
@@ -17,7 +17,7 @@ export default function MobileNav() {
         {/* Background glow for the whole bar */}
         <div className="absolute inset-0 bg-[#800000]/5 -z-10" />
         
-        {items.slice(0, 4).map(({ href, label, labelTa, icon: Icon }) => {
+        {items.slice(0, 5).map(({ href, label, labelTa, icon: Icon }) => {
           const active = pathname === href;
           return (
             <Link

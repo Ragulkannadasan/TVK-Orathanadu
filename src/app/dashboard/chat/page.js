@@ -7,7 +7,7 @@ export default async function ChatPage() {
   const initialMessages = await getMessages(50);
 
   return (
-    <div className="p-3 md:p-6 h-full flex flex-col">
+    <div className="p-3 md:p-6 h-full flex flex-col max-w-6xl mx-auto w-full">
       <div className="mb-4 md:mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-white display-font mb-0.5">
           Open <span className="gradient-text">Conversation</span>

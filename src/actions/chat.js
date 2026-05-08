@@ -8,9 +8,10 @@ import { revalidatePath } from "next/cache";
 
 export async function getMessages(limit = 50) {
   try {
+    console.log("getMessages called - Server Action");
     await dbConnect();
     const messages = await Message.find()
-      .populate("userId", "name username image role")
+      .populate("userId", "name username image role email")
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
@@ -57,6 +58,10 @@ export async function sendMessage(text) {
 
     await newMessage.save();
     
+    // Emit event for real-time SSE stream
+    const { chatEmitter } = await import("@/lib/chat-bus");
+    chatEmitter.emit("newMessage", newMessage);
+
     revalidatePath("/dashboard/chat");
     return { success: true };
   } catch (error) {
