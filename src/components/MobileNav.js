@@ -4,10 +4,18 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navItems } from "@/lib/nav";
+import { useState, useEffect } from "react";
 
 export default function MobileNav() {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const [pendingHref, setPendingHref] = useState(null);
+
+  // Clear pending state when we successfully navigate
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
+
   const role = session?.user?.role || "Voter";
   const items = (navItems[role] || navItems.Voter).filter(item => item.href !== "/dashboard/notifications");
 
@@ -18,11 +26,14 @@ export default function MobileNav() {
         <div className="absolute inset-0 bg-[#800000]/5 -z-10" />
         
         {items.slice(0, 5).map(({ href, label, labelTa, icon: Icon }) => {
-          const active = pathname === href;
+          const active = pathname === href || pendingHref === href;
           return (
             <Link
               key={href}
               href={href}
+              onClick={() => {
+                if (href !== pathname) setPendingHref(href);
+              }}
               className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative ${
                 active ? "text-[#FFD700] scale-110" : "text-[#a0a0a0] hover:text-white"
               }`}

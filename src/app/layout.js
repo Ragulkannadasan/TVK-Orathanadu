@@ -1,6 +1,8 @@
 import "./globals.css";
 import { auth } from "@/auth";
 import SessionProviderWrapper from "@/components/SessionProviderWrapper";
+import TopLoader from "@/components/TopLoader";
+import { Suspense } from "react";
 
 export const metadata = {
   title: 'TVK Orathanadu – தமிழக வெற்றி கழகம் | ஒரத்தநாடு தொகுதி 175',
@@ -32,6 +34,9 @@ export default async function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="antialiased min-h-screen flex flex-col">
+        <Suspense fallback={null}>
+          <TopLoader />
+        </Suspense>
         <SessionProviderWrapper session={session}>
           {children}
         </SessionProviderWrapper>
