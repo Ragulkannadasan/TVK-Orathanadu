@@ -5,6 +5,23 @@ import User from "@/models/User";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
+async function ensureUserInDb(sessionUser) {
+  await dbConnect();
+  let user = await User.findOne({ email: sessionUser.email });
+  
+  if (!user) {
+    user = new User({
+      name: sessionUser.name || "User",
+      email: sessionUser.email,
+      role: sessionUser.role || "Voter",
+      password: "local_auth_only",
+      isProfileComplete: true,
+    });
+    await user.save();
+  }
+  return user;
+}
+
 export async function submitGrievance(prevState, formData) {
   try {
     const session = await auth();
@@ -12,11 +29,7 @@ export async function submitGrievance(prevState, formData) {
       return { error: "You must be logged in to submit a grievance" };
     }
 
-    await dbConnect();
-    const user = await User.findOne({ email: session.user.email }).lean();
-    if (!user) {
-      return { error: "User account not found" };
-    }
+    const user = await ensureUserInDb(session.user);
 
     const title = formData.get("title");
     const description = formData.get("description");
