@@ -8,7 +8,7 @@ import InstallButton from "@/components/InstallButton";
 export default function MobileHeader({ user }) {
 
   return (
-    <header className="md:hidden sticky top-0 z-40 w-full bg-black/20 backdrop-blur-xl border-b border-white/10 px-4 py-3 flex items-center justify-between shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+    <header className="md:hidden sticky top-0 z-40 w-full bg-[#0a0a0a] border-b border-white/10 px-4 py-3 flex items-center justify-between shadow-lg">
       <div className="flex items-center gap-2">
         <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
           <img src="/icon.png" alt="TVK" className="w-full h-full object-contain" />
