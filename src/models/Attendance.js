@@ -15,8 +15,7 @@ const AttendanceSchema = new mongoose.Schema({
     default: 'General Meeting', // Can be expanded for multiple events
   },
   scannedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true,
   },
   scannedAt: {
