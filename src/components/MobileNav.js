@@ -21,9 +21,9 @@ export default function MobileNav() {
 
   return (
     <div className="md:hidden fixed bottom-4 left-3 right-3 z-50">
-      <nav className="glass-card px-2 py-3 flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/10 rounded-2xl overflow-hidden">
+      <nav className="glass px-2 py-3 flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.6)] border border-white/10 rounded-2xl overflow-hidden relative">
         {/* Background glow for the whole bar */}
-        <div className="absolute inset-0 bg-[#800000]/5 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#800000]/10 to-transparent -z-10" />
         
         {items.slice(0, 5).map(({ href, label, labelTa, icon: Icon }) => {
           const active = pathname === href || pendingHref === href;
