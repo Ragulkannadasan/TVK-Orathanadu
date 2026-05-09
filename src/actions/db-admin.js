@@ -1,7 +1,7 @@
 "use server";
 
 import dbConnect from "@/lib/db";
-import Message from "@/models/Message";
+import Chat from "@/models/Message";
 import Grievance from "@/models/Grievance";
 import User from "@/models/User";
 import { auth } from "@/auth";
@@ -21,12 +21,12 @@ export async function getDatabaseStats() {
     await dbConnect();
 
     const [
-      msgCount, 
+      msgCount,
       grievanceCount, 
       userCount,
       resolvedCount
     ] = await Promise.all([
-      Message.countDocuments(),
+      Chat.countDocuments(),
       Grievance.countDocuments(),
       User.countDocuments(),
       Grievance.countDocuments({ status: "Resolved" })
@@ -63,7 +63,7 @@ export async function clearOldMessages(days = 30) {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
     
-    const result = await Message.deleteMany({ createdAt: { $lt: cutoff } });
+    const result = await Chat.deleteMany({ createdAt: { $lt: cutoff } });
     
     revalidatePath("/dashboard/admin");
     return { success: true, deletedCount: result.deletedCount };

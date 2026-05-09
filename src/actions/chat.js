@@ -1,71 +1,53 @@
 "use server";
 
 import dbConnect from "@/lib/db";
-import Message from "@/models/Message";
-import User from "@/models/User";
+import Chat from "@/models/Message";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getMessages(limit = 50) {
   try {
-    console.log("getMessages called - Server Action");
+    const session = await auth();
+    if (!session) return { error: "Unauthorized" };
+
     await dbConnect();
-    const messages = await Message.find()
-      .populate("userId", "name username image role email")
+    const messages = await Chat.find()
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
-    
+
+    // Reverse to get chronological order for the UI
     return JSON.parse(JSON.stringify(messages.reverse()));
   } catch (error) {
-    console.error("Get Messages Error:", error);
-    return [];
+    console.error("Chat fetch error:", error);
+    return { error: "Failed to fetch messages" };
   }
 }
 
-async function ensureUserInDb(sessionUser) {
-  await dbConnect();
-  let user = await User.findOne({ email: sessionUser.email });
-  
-  if (!user) {
-    // If user exists in session but not in DB, they might be a local user
-    // Create a shadow record in DB so they can perform DB-linked actions
-    user = new User({
-      name: sessionUser.name || "User",
-      email: sessionUser.email,
-      role: sessionUser.role || "Voter",
-      password: "local_auth_only", // This user logs in via local JSON, not DB
-      isProfileComplete: true,
-    });
-    await user.save();
-  }
-  return user;
-}
-
-export async function sendMessage(text) {
+export async function sendMessage(content) {
   try {
     const session = await auth();
-    if (!session?.user) throw new Error("Unauthorized");
+    if (!session?.user) return { error: "Authentication required" };
 
-    const user = await ensureUserInDb(session.user);
+    if (!content || content.trim().length === 0) return { error: "Message cannot be empty" };
 
-    if (!text || text.trim().length === 0) return { error: "Message cannot be empty" };
-
-    const newMessage = new Message({
-      userId: user._id,
-      text: text.trim(),
-    });
-
-    await newMessage.save();
+    await dbConnect();
     
-    // Emit event for real-time SSE stream
-    const { chatEmitter } = await import("@/lib/chat-bus");
-    chatEmitter.emit("newMessage", newMessage);
+    const messageData = {
+      senderEmail: session.user.email,
+      senderName: session.user.name || "Anonymous",
+      content: content.trim(),
+      role: session.user.role || 'Voter',
+    };
 
-    revalidatePath("/dashboard/chat");
-    return { success: true };
+    console.log("Attempting to save message:", { ...messageData, content: "[HIDDEN]" });
+
+    const newMessage = await Chat.create(messageData);
+
+    revalidatePath("/chat");
+    return { success: true, message: JSON.parse(JSON.stringify(newMessage)) };
   } catch (error) {
-    console.error("Send Message Error:", error);
-    return { error: error.message };
+    console.error("CRITICAL SEND ERROR:", error);
+    return { error: error.message || "Failed to send message. Please check your connection." };
   }
 }

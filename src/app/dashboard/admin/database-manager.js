@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getDatabaseStats, clearOldMessages, clearResolvedGrievances } from "@/actions/db-admin";
-import { Database, Trash2, AlertTriangle, HardDrive, RefreshCw } from "lucide-react";
+import { Database, Trash2, HardDrive, RefreshCw } from "lucide-react";
 
 export default function DatabaseManager() {
   const [stats, setStats] = useState(null);

@@ -1,22 +1,14 @@
 import mongoose from 'mongoose';
 
-const MessageSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  text: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    index: true,
-  },
+const ChatSchema = new mongoose.Schema({
+  senderEmail: { type: String, required: true },
+  senderName: { type: String, required: true },
+  content: { type: String, required: true },
+  role: { type: String, enum: ['Admin', 'Poruppalar', 'Voter'], default: 'Voter' },
+  createdAt: { type: Date, default: Date.now }
 });
 
-MessageSchema.index({ createdAt: -1 });
+// Index for performance and cleanup
+ChatSchema.index({ createdAt: -1 });
 
-export default mongoose.models.Message || mongoose.model('Message', MessageSchema);
+export default mongoose.models.Chat || mongoose.model('Chat', ChatSchema);
