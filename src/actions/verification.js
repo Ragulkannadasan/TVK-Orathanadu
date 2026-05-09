@@ -25,15 +25,17 @@ export async function verifyUserAction(userId) {
       throw new Error("User not found");
     }
 
-    // Record Attendance
+    // Record Attendance - Use ID if available, fallback to Email
+    const scannerIdentifier = session.user.id || session.user.email || "Unknown Admin";
+
     await Attendance.create({
       userId: user._id,
       userName: user.name,
       userRole: user.role,
       panchayat: user.panchayat,
       boothNumber: user.boothNumber,
-      event: "Constituency Meeting", // Default event
-      scannedBy: session.user.id
+      event: "Constituency Meeting", 
+      scannedBy: scannerIdentifier
     });
 
     return {
