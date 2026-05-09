@@ -17,6 +17,11 @@ export async function deleteUser(userId) {
     await checkAdmin();
     await dbConnect();
     
+    const targetUser = await User.findById(userId);
+    if (targetUser?.email === "admin@tvk.com") {
+      return { error: "The primary Admin account cannot be deleted" };
+    }
+
     // Don't allow deleting self
     const session = await auth();
     if (session.user.id === userId) {
@@ -36,6 +41,11 @@ export async function updateUserRole(userId, newRole) {
   try {
     await checkAdmin();
     await dbConnect();
+
+    const targetUser = await User.findById(userId);
+    if (targetUser?.email === "admin@tvk.com") {
+      return { error: "The primary Admin's role cannot be changed" };
+    }
 
     const allowedRoles = ['Voter', 'Poruppalar', 'Admin', 'MLA', 'DistSecretary'];
     if (!allowedRoles.includes(newRole)) {
