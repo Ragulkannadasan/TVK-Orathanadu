@@ -3,15 +3,20 @@
 import { QRCodeSVG } from "qrcode.react";
 import { User, Calendar, MapPin, ShieldCheck } from "lucide-react";
 
-export default function DigitalTicket({ user }) {
+export default function DigitalTicket({ user, bookings = [] }) {
   if (!user) return null;
+
+  const latestBooking = bookings[0]; // Assume first one is the most relevant for now
 
   // The QR data will be the User ID for verification
   const qrData = JSON.stringify({
     type: "TVK_VERIFY",
     id: user.id || user._id,
     name: user.name,
-    role: user.role
+    role: user.role,
+    bookingId: latestBooking?._id,
+    seat: latestBooking?.seatNumber,
+    event: latestBooking?.eventId?.title
   });
 
   return (
@@ -65,6 +70,19 @@ export default function DigitalTicket({ user }) {
               <span className="text-xs font-bold text-white truncate">{user.panchayat || "Not Set"}</span>
             </div>
           </div>
+
+          {latestBooking && (
+            <div className="w-full mt-6 p-3 rounded-xl bg-[#FFD700]/5 border border-[#FFD700]/10 flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-[7px] uppercase font-black text-[#FFD700]/40 tracking-widest leading-none mb-1">Active Event</span>
+                <span className="text-[10px] font-bold text-white truncate max-w-[150px]">{latestBooking.eventId?.title}</span>
+              </div>
+              <div className="flex flex-col text-right">
+                <span className="text-[7px] uppercase font-black text-[#FFD700]/40 tracking-widest leading-none mb-1">Seat Number</span>
+                <span className="text-sm font-black text-[#FFD700] leading-none">{latestBooking.seatNumber}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Bottom Section - Footer */}

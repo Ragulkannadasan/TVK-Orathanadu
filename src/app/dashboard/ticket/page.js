@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import DigitalTicket from "@/components/DigitalTicket";
+import { getBookings } from "@/actions/event";
 
 export const metadata = { title: "My Digital Ticket – TVK Orathanadu" };
 
@@ -10,6 +11,7 @@ export default async function TicketPage() {
   
   await dbConnect();
   const user = await User.findOne({ email: session.user.email }).lean();
+  const bookings = await getBookings();
 
   return (
     <div className="p-4 md:p-6 min-h-[80vh] flex flex-col items-center justify-center">
@@ -22,7 +24,10 @@ export default async function TicketPage() {
         </p>
       </div>
 
-      <DigitalTicket user={JSON.parse(JSON.stringify(user))} />
+      <DigitalTicket 
+        user={JSON.parse(JSON.stringify(user))} 
+        bookings={JSON.parse(JSON.stringify(bookings))} 
+      />
     </div>
   );
 }

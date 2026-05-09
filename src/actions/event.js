@@ -33,12 +33,16 @@ export async function createEvent(formData) {
     const description = formData.get("description");
     const date = formData.get("date");
     const location = formData.get("location");
+    const capacity = parseInt(formData.get("capacity")) || 100;
+    const seatPrefix = formData.get("seatPrefix") || "S";
 
     const newEvent = new Event({
       title,
       description,
       date: new Date(date),
       location,
+      capacity,
+      seatPrefix,
       createdBy: session.user.email
     });
 
@@ -47,6 +51,65 @@ export async function createEvent(formData) {
     return { success: true };
   } catch (error) {
     return { error: error.message };
+  }
+}
+
+export async function registerForEvent(eventId) {
+  try {
+    const session = await auth();
+    if (!session) throw new Error("Please login to register");
+
+    const BookingModule = await import("@/models/Booking");
+    const Booking = BookingModule.default || BookingModule;
+
+    await dbConnect();
+
+    // 1. Check if already registered
+    const existing = await Booking.findOne({ eventId, userId: session.user.id });
+    if (existing) return { error: "Already registered for this event" };
+
+    // 2. Get event details
+    const event = await Event.findById(eventId);
+    if (!event || !event.isActive) throw new Error("Event is not available");
+
+    // 3. Count current bookings to assign seat
+    const count = await Booking.countDocuments({ eventId });
+    if (count >= event.capacity) throw new Error("Event is full");
+
+    // 4. Assign next seat
+    const seatNumber = `${event.seatPrefix}-${count + 1}`;
+
+    const newBooking = new Booking({
+      eventId,
+      userId: session.user.id,
+      seatNumber
+    });
+
+    await newBooking.save();
+    revalidatePath("/dashboard/ticket");
+    revalidatePath("/dashboard/admin/events");
+    return { success: true, seatNumber };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+export async function getBookings() {
+  try {
+    const session = await auth();
+    if (!session) return [];
+
+    const BookingModule = await import("@/models/Booking");
+    const Booking = BookingModule.default || BookingModule;
+
+    await dbConnect();
+    const bookings = await Booking.find({ userId: session.user.id })
+      .populate('eventId')
+      .lean();
+
+    return JSON.parse(JSON.stringify(bookings));
+  } catch (error) {
+    return [];
   }
 }
 

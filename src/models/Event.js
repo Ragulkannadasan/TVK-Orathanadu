@@ -11,6 +11,14 @@ const EventSchema = new mongoose.Schema({
     required: true,
   },
   location: String,
+  capacity: {
+    type: Number,
+    default: 100,
+  },
+  seatPrefix: {
+    type: String,
+    default: "S",
+  },
   isActive: {
     type: Boolean,
     default: true,
