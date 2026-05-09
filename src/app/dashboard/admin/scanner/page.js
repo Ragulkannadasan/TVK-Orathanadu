@@ -3,14 +3,28 @@
 import { useEffect, useState, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { verifyUserAction } from "@/actions/verification";
-import { User, CheckCircle, XCircle, Loader2, ShieldCheck, Camera } from "lucide-react";
+import { getEvents } from "@/actions/event";
+import { User, CheckCircle, XCircle, Loader2, ShieldCheck, Camera, Calendar } from "lucide-react";
 
 export default function ScannerPage() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isScanning, setIsScanning] = useState(true);
+  const [events, setEvents] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState("Constituency Meeting");
   const scannerRef = useRef(null);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      const activeEvents = await getEvents();
+      setEvents(activeEvents.filter(e => e.isActive));
+      if (activeEvents.length > 0) {
+        setSelectedEvent(activeEvents[0].title);
+      }
+    }
+    fetchEvents();
+  }, []);
 
   useEffect(() => {
     if (isScanning) {
@@ -27,7 +41,7 @@ export default function ScannerPage() {
 
     return () => {
       if (scannerRef.current) {
-        scannerRef.current.clear();
+        scannerRef.current.clear().catch(console.error);
       }
     };
   }, [isScanning]);
@@ -44,8 +58,8 @@ export default function ScannerPage() {
         throw new Error("Invalid QR Code: Not a TVK verification code");
       }
 
-      // Verify with server
-      const res = await verifyUserAction(data.id);
+      // Verify with server using selected event
+      const res = await verifyUserAction(data.id, selectedEvent);
       if (res.error) {
         setError(res.error);
       } else {
@@ -81,6 +95,27 @@ export default function ScannerPage() {
           Event Verification Terminal
         </p>
       </div>
+
+      {isScanning && (
+        <div className="mb-6 animate-fade-in">
+          <div className="flex flex-col gap-1 mb-2 px-1">
+            <label className="text-[10px] uppercase font-black text-white/40 tracking-[0.2em] flex items-center gap-2">
+              <Calendar size={12} className="text-[#FFD700]" /> Active Event
+            </label>
+          </div>
+          <select 
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+            className="input-dark bg-black/40 border-white/5 py-3 text-sm font-bold uppercase tracking-wider"
+          >
+            {events.length > 0 ? events.map(e => (
+              <option key={e._id} value={e.title}>{e.title}</option>
+            )) : (
+              <option value="Constituency Meeting">Constituency Meeting</option>
+            )}
+          </select>
+        </div>
+      )}
 
       <div className="glass-card overflow-hidden border-white/5 relative">
         {isScanning && (

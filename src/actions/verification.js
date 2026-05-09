@@ -5,7 +5,7 @@ import User from "@/models/User";
 import Attendance from "@/models/Attendance";
 import { auth } from "@/auth";
 
-export async function verifyUserAction(userId) {
+export async function verifyUserAction(userId, eventName = "Constituency Meeting") {
   try {
     const session = await auth();
     // ONLY Admin can verify and record attendance
@@ -34,7 +34,7 @@ export async function verifyUserAction(userId) {
       userRole: user.role,
       panchayat: user.panchayat,
       boothNumber: user.boothNumber,
-      event: "Constituency Meeting", 
+      event: eventName, 
       scannedBy: scannerIdentifier
     });
 
