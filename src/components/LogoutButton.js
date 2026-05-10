@@ -9,7 +9,8 @@ export default function LogoutButton({ className }) {
 
   const handleLogout = async () => {
     setLoading(true);
-    await signOut({ callbackUrl: "/login" });
+    // Use window.location.origin to ensure it redirects to the current domain (Vercel or Local)
+    await signOut({ callbackUrl: window.location.origin });
   };
 
   return (

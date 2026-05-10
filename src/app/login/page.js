@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import OTPLoginForm from './otp-form';
 import LoginForm from './login-form';
 
@@ -8,7 +10,14 @@ export default function LoginPage() {
   const [mode, setMode] = useState('otp'); // 'otp' or 'password'
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 relative">
+      <Link 
+        href="/" 
+        className="absolute top-8 left-8 flex items-center gap-2 text-text-muted hover:text-gold-dynamic transition-all group"
+      >
+        <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+        <span className="text-xs font-black uppercase tracking-widest">Back to Home</span>
+      </Link>
       <div className="absolute inset-0 overflow-hidden -z-10">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[#800000]/10 blur-3xl animate-float" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-[#FFD700]/5 blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
