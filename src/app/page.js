@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import InstallButton from "@/components/InstallButton";
+import PublicNavbar from "@/components/PublicNavbar";
 
 export const metadata = {
   title: 'TVK Orathanadu – மக்கள் போர்ட்டல் | People\'s Portal',
@@ -16,14 +17,11 @@ export default async function LandingPage() {
 
   return (
     <main className="min-h-screen bg-transparent overflow-x-hidden grid-overlay">
+      <PublicNavbar />
       {/* Decorative Blobs */}
       <div className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none">
         <div className="absolute top-[10%] left-[5%] w-[40%] h-[40%] bg-maroon/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-[10%] right-[5%] w-[40%] h-[40%] bg-maroon/5 rounded-full blur-[120px]" />
-      </div>
-      {/* Absolute Header Controls */}
-      <div className="absolute top-6 right-6 z-50">
-        <InstallButton />
       </div>
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20">
