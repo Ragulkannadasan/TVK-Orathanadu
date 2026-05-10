@@ -17,7 +17,7 @@ export default function FeedbackForm() {
   return (
     <form ref={formRef} action={action} className="space-y-5">
       <div className="space-y-2">
-        <label className="text-sm font-bold text-white/70 ml-1 uppercase tracking-wider">Category / வகை</label>
+        <label className="text-sm font-bold text-foreground/70 ml-1 uppercase tracking-wider">Category / வகை</label>
         <select
           name="category"
           className="input-dark bg-[#0a0a0a]"
@@ -31,7 +31,7 @@ export default function FeedbackForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-bold text-white/70 ml-1 uppercase tracking-wider">Subject / தலைப்பு</label>
+        <label className="text-sm font-bold text-foreground/70 ml-1 uppercase tracking-wider">Subject / தலைப்பு</label>
         <input
           name="subject"
           type="text"
@@ -42,7 +42,7 @@ export default function FeedbackForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-bold text-white/70 ml-1 uppercase tracking-wider">Message / செய்தி</label>
+        <label className="text-sm font-bold text-foreground/70 ml-1 uppercase tracking-wider">Message / செய்தி</label>
         <textarea
           name="message"
           rows={5}
@@ -71,7 +71,7 @@ export default function FeedbackForm() {
         disabled={isPending}
         className="btn-primary w-full py-4 flex items-center justify-center gap-2 group overflow-hidden relative"
       >
-        <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+        <div className="absolute inset-0 bg-surface-border/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
         <Send size={18} className={isPending ? "animate-pulse" : "group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"} />
         <span className="font-bold tracking-tight">
           {isPending ? "Submitting..." : "Submit Feedback / சமர்ப்பிக்கவும்"}

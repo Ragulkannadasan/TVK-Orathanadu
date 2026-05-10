@@ -63,12 +63,12 @@ export default function MembershipCard({ user }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-[#FFD700] font-bold text-lg leading-tight tamil display-font">தமிழக வெற்றி கழகம்</h2>
-              <p className="text-white/70 text-xs mt-0.5">Thamizhaga Vetri Kazhagam</p>
+              <h2 className="text-gold-dynamic font-bold text-lg leading-tight tamil display-font">தமிழக வெற்றி கழகம்</h2>
+              <p className="text-foreground/70 text-xs mt-0.5">Thamizhaga Vetri Kazhagam</p>
             </div>
             <div className="text-right">
-              <p className="text-[#FFD700]/80 text-[10px] uppercase tracking-wider">Digital ID</p>
-              <p className="text-white/60 text-xs">Orathanadu 175</p>
+              <p className="text-gold-dynamic/80 text-[10px] uppercase tracking-wider">Digital ID</p>
+              <p className="text-text-muted text-xs">Orathanadu 175</p>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ export default function MembershipCard({ user }) {
               {user?.image ? (
                 <img src={user.image} alt="" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-[#FFD700] font-bold text-2xl">{initials}</span>
+                <span className="text-gold-dynamic font-bold text-2xl">{initials}</span>
               )}
             </div>
             <div>
@@ -97,7 +97,7 @@ export default function MembershipCard({ user }) {
 
           {/* Footer */}
           <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
-            <p className="text-[#FFD700]/70 text-[10px] italic tamil">"பிறப்பொக்கும் எல்லா உயிர்க்கும்"</p>
+            <p className="text-gold-dynamic/70 text-[10px] italic tamil">"பிறப்பொக்கும் எல்லா உயிர்க்கும்"</p>
             <div className="flex gap-1">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="w-1.5 h-1.5 rounded-full bg-[#FFD700]/30" />
@@ -126,7 +126,7 @@ export default function MembershipCard({ user }) {
 function InfoBlock({ label, value }) {
   return (
     <div className="bg-black/20 rounded-lg p-3">
-      <p className="text-[#FFD700]/60 text-[10px] uppercase tracking-wider">{label}</p>
+      <p className="text-gold-dynamic/60 text-[10px] uppercase tracking-wider">{label}</p>
       <p className="text-white font-semibold text-sm mt-0.5 truncate">{value}</p>
     </div>
   );

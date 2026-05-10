@@ -15,11 +15,11 @@ export default async function UserEventsPage() {
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <div className="mb-10">
-        <h1 className="text-4xl font-bold text-white display-font mb-1">
+        <h1 className="text-4xl font-bold text-foreground display-font mb-1">
           Constituency <span className="gradient-text">Events</span>
         </h1>
-        <p className="text-white/40 text-sm md:text-base uppercase font-black tracking-widest flex items-center gap-2">
-          <Calendar size={14} className="text-[#FFD700]" /> Join Our Gatherings
+        <p className="text-text-muted text-sm md:text-base uppercase font-black tracking-widest flex items-center gap-2">
+          <Calendar size={14} className="text-gold-dynamic" /> Join Our Gatherings
         </p>
       </div>
 

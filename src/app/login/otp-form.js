@@ -53,7 +53,7 @@ export default function OTPLoginForm() {
       {step === "email" ? (
         <form action={sendAction} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70 ml-1 text-center block">Enter Your Email</label>
+            <label className="text-sm font-medium text-foreground/70 ml-1 text-center block">Enter Your Email</label>
             <input
               name="email"
               type="email"
@@ -82,18 +82,18 @@ export default function OTPLoginForm() {
       ) : (
         <form onSubmit={handleVerify} className="space-y-4">
           <div className="text-center mb-4">
-            <p className="text-white/60 text-sm">Code sent to <b>{email}</b></p>
+            <p className="text-text-muted text-sm">Code sent to <b>{email}</b></p>
             <button 
               type="button" 
               onClick={() => { setStep("email"); setError(""); }}
-              className="text-[#FFD700] text-xs hover:underline mt-1"
+              className="text-gold-dynamic text-xs hover:underline mt-1"
             >
               Change Email
             </button>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/70 ml-1 text-center block">Enter 6-Digit Code</label>
+            <label className="text-sm font-medium text-foreground/70 ml-1 text-center block">Enter 6-Digit Code</label>
             <input
               name="otp"
               type="text"

@@ -18,8 +18,8 @@ export default async function ProfilePage() {
     // For this rewrite, we'll assume only signed up users or those we migrate can update
     return (
       <div className="p-10 text-center">
-        <h2 className="text-white font-bold text-xl mb-4">Local Auth Mode</h2>
-        <p className="text-white/50 max-w-md mx-auto mb-6">
+        <h2 className="text-foreground font-bold text-xl mb-4">Local Auth Mode</h2>
+        <p className="text-text-muted max-w-md mx-auto mb-6">
           You are logged in via the local JSON file. Profile updates are only available for users registered in the MongoDB database.
         </p>
         <LogoutButton className="max-w-xs mx-auto" />
@@ -33,10 +33,10 @@ export default async function ProfilePage() {
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto">
       <div className="mb-10">
-        <h1 className="text-4xl font-bold text-white display-font mb-1">
+        <h1 className="text-4xl font-bold text-foreground display-font mb-1">
           Profile <span className="gradient-text">Settings</span>
         </h1>
-        <p className="text-white/40 text-sm md:text-base">
+        <p className="text-text-muted text-sm md:text-base">
           Manage your personal and voter information
         </p>
       </div>
@@ -48,7 +48,7 @@ export default async function ProfilePage() {
             <div className="relative w-28 h-28 mx-auto mb-4 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] shadow-lg">
               <div className="w-full h-full rounded-full bg-black p-0.5">
                 <div 
-                  className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-white/10"
+                  className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-surface-border"
                   suppressHydrationWarning
                 >
                   {user.image ? (
@@ -59,36 +59,36 @@ export default async function ProfilePage() {
                       suppressHydrationWarning
                     />
                   ) : (
-                    <span className="text-3xl font-bold text-[#FFD700]">{user.name[0]}</span>
+                    <span className="text-3xl font-bold text-gold-dynamic">{user.name[0]}</span>
                   )}
                 </div>
               </div>
             </div>
-            <h3 className="text-white font-bold text-lg">{user.name}</h3>
-            <p className="text-[#FFD700] text-xs font-bold mb-1">@{user.username || user.email.split('@')[0]}</p>
-            <p className="text-white/40 text-[10px] truncate mb-4">{user.email}</p>
-            <div className="mt-4 px-4 py-1.5 rounded-full bg-[#FFD700]/10 text-[#FFD700] text-[10px] font-black uppercase tracking-widest inline-block border border-[#FFD700]/20">
+            <h3 className="text-foreground font-bold text-lg">{user.name}</h3>
+            <p className="text-gold-dynamic text-xs font-bold mb-1">@{user.username || user.email.split('@')[0]}</p>
+            <p className="text-text-muted text-[10px] truncate mb-4">{user.email}</p>
+            <div className="mt-4 px-4 py-1.5 rounded-full bg-[#FFD700]/10 text-gold-dynamic text-[10px] font-black uppercase tracking-widest inline-block border border-[#FFD700]/20">
               {user.role}
             </div>
           </div>
           
           <div className="glass-card p-5 space-y-5">
-            <div className="flex items-center gap-3 text-white/60">
-              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                <MapPin size={16} className="text-[#FFD700]" />
+            <div className="flex items-center gap-3 text-text-muted">
+              <div className="p-2 rounded-lg bg-surface-border/10 border border-surface-border">
+                <MapPin size={16} className="text-gold-dynamic" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-white/30 uppercase font-black">Panchayat</span>
-                <span className="text-xs font-bold text-white">{user.panchayat || "Not Set"}</span>
+                <span className="text-[10px] text-text-muted uppercase font-black">Panchayat</span>
+                <span className="text-xs font-bold text-foreground">{user.panchayat || "Not Set"}</span>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-white/60">
-              <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                <Contact size={16} className="text-[#FFD700]" />
+            <div className="flex items-center gap-3 text-text-muted">
+              <div className="p-2 rounded-lg bg-surface-border/10 border border-surface-border">
+                <Contact size={16} className="text-gold-dynamic" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] text-white/30 uppercase font-black">Booth Number</span>
-                <span className="text-xs font-bold text-white">{user.boothNumber || "Not Set"}</span>
+                <span className="text-[10px] text-text-muted uppercase font-black">Booth Number</span>
+                <span className="text-xs font-bold text-foreground">{user.boothNumber || "Not Set"}</span>
               </div>
             </div>
           </div>
@@ -97,9 +97,9 @@ export default async function ProfilePage() {
         </div>
 
         <div className="md:col-span-2">
-          <div className="glass-card p-8 border-white/5">
-            <h3 className="text-white font-bold text-xl mb-8 flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-[#FFD700]/10 border border-[#FFD700]/20 text-[#FFD700]">
+          <div className="glass-card p-8 border-surface-border">
+            <h3 className="text-foreground font-bold text-xl mb-8 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-[#FFD700]/10 border border-[#FFD700]/20 text-gold-dynamic">
                 <UserCircle size={20} />
               </div>
               Edit Account Profile

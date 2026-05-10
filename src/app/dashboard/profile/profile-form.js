@@ -57,16 +57,16 @@ export default function ProfileForm({ user }) {
       <input type="hidden" name="image" value={imagePreview} />
 
       {/* Profile Photo Section (Instagram Style) */}
-      <div className="flex flex-col items-center gap-6 mb-10 pb-8 border-b border-white/5">
+      <div className="flex flex-col items-center gap-6 mb-10 pb-8 border-b border-surface-border">
         <div className="relative group">
           {/* Animated Ring */}
           <div className="w-32 h-32 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] shadow-2xl">
             <div className="w-full h-full rounded-full bg-black p-1">
-              <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-white/10">
+              <div className="w-full h-full rounded-full bg-[#1a1a1a] flex items-center justify-center overflow-hidden border border-surface-border">
                 {imagePreview ? (
                   <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-white/20 text-5xl font-bold">{user.name[0]}</span>
+                  <span className="text-text-muted/50 text-5xl font-bold">{user.name[0]}</span>
                 )}
               </div>
             </div>
@@ -86,11 +86,11 @@ export default function ProfileForm({ user }) {
           <button
             type="button"
             onClick={() => fileInputRef.current.click()}
-            className="text-[#FFD700] text-sm font-bold hover:underline transition-all"
+            className="text-gold-dynamic text-sm font-bold hover:underline transition-all"
           >
             Change Profile Photo
           </button>
-          <p className="text-[10px] text-white/30 mt-1 uppercase tracking-widest font-bold">Square JPG/PNG (Max 2MB)</p>
+          <p className="text-[10px] text-text-muted mt-1 uppercase tracking-widest font-bold">Square JPG/PNG (Max 2MB)</p>
         </div>
 
         <input
@@ -104,9 +104,9 @@ export default function ProfileForm({ user }) {
 
       <div className="space-y-6">
         <div className="space-y-1">
-          <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Username</label>
+          <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Username</label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#FFD700] font-bold">@</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gold-dynamic font-bold">@</span>
             <input
               name="username"
               type="text"
@@ -116,12 +116,12 @@ export default function ProfileForm({ user }) {
               required
             />
           </div>
-          <p className="text-[9px] text-white/20 ml-1">Your unique handle (e.g., @ragul_tvk)</p>
+          <p className="text-[9px] text-text-muted/50 ml-1">Your unique handle (e.g., @ragul_tvk)</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Mobile Number</label>
+            <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Mobile Number</label>
             <input
               name="mobile"
               type="tel"
@@ -132,7 +132,7 @@ export default function ProfileForm({ user }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Voter ID Number</label>
+            <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Voter ID Number</label>
             <input
               name="voterId"
               type="text"
@@ -145,7 +145,7 @@ export default function ProfileForm({ user }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Panchayat</label>
+            <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Panchayat</label>
             <select name="panchayat" defaultValue={user.panchayat} className="input-dark bg-black/40">
               <option value="">Select Panchayat</option>
               {PANCHAYATS.map((p) => (
@@ -155,7 +155,7 @@ export default function ProfileForm({ user }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Booth Number</label>
+            <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Booth Number</label>
             <input
               name="boothNumber"
               type="text"

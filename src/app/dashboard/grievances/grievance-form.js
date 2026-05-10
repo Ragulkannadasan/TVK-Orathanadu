@@ -20,7 +20,7 @@ export default function GrievanceForm({ userId, panchayat, booth }) {
       <input type="hidden" name="boothNumber" value={booth || ""} />
 
       <div className="space-y-1">
-        <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Category</label>
+        <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Category</label>
         <select name="category" className="input-dark bg-black/40" required>
           <option value="Agriculture">Agriculture</option>
           <option value="Water">Water</option>
@@ -31,7 +31,7 @@ export default function GrievanceForm({ userId, panchayat, booth }) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Subject</label>
+        <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Subject</label>
         <input
           name="title"
           type="text"
@@ -42,7 +42,7 @@ export default function GrievanceForm({ userId, panchayat, booth }) {
       </div>
 
       <div className="space-y-1">
-        <label className="text-[10px] uppercase font-bold text-white/50 ml-1">Description</label>
+        <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Description</label>
         <textarea
           name="description"
           placeholder="Describe the problem in detail..."

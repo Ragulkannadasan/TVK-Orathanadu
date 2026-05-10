@@ -9,7 +9,7 @@ export default function LoginForm() {
   return (
     <form action={action} className="space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-white/70 ml-1">Email Address</label>
+        <label className="text-sm font-medium text-foreground/70 ml-1">Email Address</label>
         <input
           name="email"
           type="email"
@@ -20,7 +20,7 @@ export default function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-white/70 ml-1">Password</label>
+        <label className="text-sm font-medium text-foreground/70 ml-1">Password</label>
         <input
           name="password"
           type="password"

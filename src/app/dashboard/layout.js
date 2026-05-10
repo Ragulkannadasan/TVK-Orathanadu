@@ -1,28 +1,18 @@
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import MobileHeader from "@/components/MobileHeader";
-import { auth } from "@/auth";
+import { getSessionUser } from "@/lib/session";
 import { redirect } from "next/navigation";
-import dbConnect from "@/lib/db";
-import User from "@/models/User";
 
 export default async function DashboardLayout({ children }) {
-  const session = await auth();
+  const dbUser = await getSessionUser();
 
-  if (!session) {
+  if (!dbUser) {
     redirect("/login");
   }
-
-  // Fetch fresh user data from DB to ensure profile photo is always current
-  await dbConnect();
-  const dbUser = await User.findOne({ email: session.user.email }).lean();
   
-  // Create a merged user object
-  const displayUser = {
-    ...session.user,
-    image: dbUser?.image || session.user.image,
-    name: dbUser?.name || session.user.name
-  };
+  // dbUser is already plain and complete from the cached helper
+  const displayUser = dbUser;
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

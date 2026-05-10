@@ -50,15 +50,15 @@ export default function GrievanceList({ initialGrievances }) {
     <div className="space-y-6">
       {/* Filters */}
       <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        <Filter size={16} className="text-white/20 shrink-0" />
+        <Filter size={16} className="text-text-muted shrink-0" />
         {["All", "Pending", "Investigating", "Resolved"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border
               ${filter === f 
-                ? "bg-[#FFD700] text-black border-[#FFD700]" 
-                : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"}`}
+                ? "bg-maroon text-gold border-maroon" 
+                : "bg-surface-border/10 text-text-muted border-surface-border hover:bg-surface-border/20"}`}
           >
             {f}
           </button>
@@ -67,32 +67,32 @@ export default function GrievanceList({ initialGrievances }) {
 
       <div className="grid grid-cols-1 gap-4">
         {filteredGrievances.length === 0 ? (
-          <div className="glass-card p-20 text-center text-white/20 italic uppercase text-xs font-bold tracking-[0.2em]">
+          <div className="glass-card p-20 text-center text-text-muted/50 italic uppercase text-xs font-bold tracking-[0.2em]">
             No grievances found for {filter}
           </div>
         ) : (
           filteredGrievances.map((g) => (
-            <div key={g._id} className="glass-card p-6 border-white/5 group hover:border-[#800000]/30 transition-all">
+            <div key={g._id} className="glass-card p-6 border-surface-border group hover:border-[#800000]/30 transition-all">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                 
                 {/* Left Side: Content */}
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-[9px] px-2 py-0.5 rounded bg-[#800000]/20 text-[#FFD700] uppercase font-black tracking-widest border border-[#800000]/30">
+                    <span className="text-[9px] px-2 py-0.5 rounded bg-[#800000]/20 text-gold-dynamic uppercase font-black tracking-widest border border-[#800000]/30">
                       {g.category}
                     </span>
                     <StatusBadge status={g.status} />
                   </div>
 
                   <div>
-                    <h3 className="text-white font-bold text-lg mb-2 group-hover:text-[#FFD700] transition-colors">{g.title}</h3>
-                    <p className="text-white/50 text-sm leading-relaxed max-w-3xl">{g.description}</p>
+                    <h3 className="text-foreground font-bold text-lg mb-2 group-hover:text-maroon dark:group-hover:text-gold transition-colors">{g.title}</h3>
+                    <p className="text-text-muted text-sm leading-relaxed max-w-3xl">{g.description}</p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-[10px] text-white/30 uppercase font-bold tracking-widest pt-2">
-                    <div className="flex items-center gap-1.5"><UserIcon size={12} className="text-[#FFD700]/40" /> {g.userId?.name || "Deleted User"}</div>
-                    <div className="flex items-center gap-1.5"><MapPin size={12} className="text-[#FFD700]/40" /> {g.panchayat || "Unknown"} · {g.boothNumber || "Booth N/A"}</div>
-                    <div className="flex items-center gap-1.5"><Calendar size={12} className="text-[#FFD700]/40" /> {new Date(g.createdAt).toLocaleDateString()}</div>
+                  <div className="flex flex-wrap items-center gap-4 text-[10px] text-text-muted uppercase font-bold tracking-widest pt-2">
+                    <div className="flex items-center gap-1.5"><UserIcon size={12} className="text-maroon dark:text-gold/40" /> {g.userId?.name || "Deleted User"}</div>
+                    <div className="flex items-center gap-1.5"><MapPin size={12} className="text-maroon dark:text-gold/40" /> {g.panchayat || "Unknown"} · {g.boothNumber || "Booth N/A"}</div>
+                    <div className="flex items-center gap-1.5"><Calendar size={12} className="text-maroon dark:text-gold/40" /> {new Date(g.createdAt).toLocaleDateString()}</div>
                   </div>
                 </div>
 
@@ -103,7 +103,7 @@ export default function GrievanceList({ initialGrievances }) {
                         value={g.status}
                         disabled={loading === g._id}
                         onChange={(e) => handleStatusUpdate(g._id, e.target.value)}
-                        className="bg-black/40 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl focus:outline-none focus:border-[#FFD700] transition-all cursor-pointer"
+                        className="bg-black/40 border border-surface-border text-foreground text-[10px] font-black uppercase tracking-widest px-3 py-2 rounded-xl focus:outline-none focus:border-[#FFD700] transition-all cursor-pointer"
                       >
                         <option value="Pending">Mark Pending</option>
                         <option value="Investigating">Mark Investigating</option>
@@ -113,7 +113,7 @@ export default function GrievanceList({ initialGrievances }) {
                       <button
                         onClick={() => handleDelete(g._id)}
                         disabled={loading === g._id}
-                        className="p-2.5 rounded-xl bg-red-500/5 text-red-500/50 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
+                        className="p-2.5 rounded-xl bg-red-500/5 text-red-500/50 hover:bg-red-500 hover:text-foreground transition-all disabled:opacity-50"
                       >
                         <Trash2 size={16} />
                       </button>

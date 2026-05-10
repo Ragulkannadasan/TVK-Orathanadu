@@ -31,13 +31,13 @@ export default function MobileNav() {
       {/* More Menu Backdrop */}
       {showMore && (
         <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[-1] animate-fade-in"
+          className="fixed inset-0 bg-black/60 z-[-1] animate-fade-in"
           onClick={() => setShowMore(false)}
         />
       )}
 
       {/* More Menu Content */}
-      <div className={`absolute bottom-full left-0 right-0 mb-4 bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden transition-all duration-500 transform ${
+      <div className={`absolute bottom-full left-0 right-0 mb-4 bg-surface/90 backdrop-blur-2xl border border-surface-border rounded-3xl overflow-hidden transition-all duration-500 transform ${
         showMore ? "translate-y-0 opacity-100 scale-100" : "translate-y-10 opacity-0 scale-95 pointer-events-none"
       }`}>
         <div className="p-4 grid grid-cols-3 gap-4">
@@ -48,8 +48,8 @@ export default function MobileNav() {
               onClick={() => {
                 if (href !== pathname) setPendingHref(href);
               }}
-              className={`flex flex-col items-center gap-2 p-3 rounded-xl transition-all ${
-                pathname === href ? "bg-[#800000]/20 text-[#FFD700]" : "text-white/60 hover:bg-white/5"
+              className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${
+                pathname === href ? "bg-accent/20 text-gold-dynamic" : "text-text-muted hover:bg-surface-border/10"
               }`}
             >
               <Icon size={20} />
@@ -59,9 +59,8 @@ export default function MobileNav() {
         </div>
       </div>
 
-      <nav className="bg-[#0a0a0a] px-2 py-3 flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.8)] border border-white/10 rounded-2xl overflow-hidden relative">
+      <nav className="bg-surface/80 backdrop-blur-2xl px-2 py-3 flex items-center justify-around shadow-lg border border-surface-border rounded-3xl overflow-hidden relative">
         <div className="absolute inset-0 bg-gradient-to-t from-[#800000]/10 to-transparent -z-10" />
-        
         {visibleItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href || pendingHref === href;
           return (
@@ -71,15 +70,12 @@ export default function MobileNav() {
               onClick={() => {
                 if (href !== pathname) setPendingHref(href);
               }}
-              className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative flex-1 ${
-                active ? "text-[#FFD700] scale-110" : "text-[#a0a0a0] hover:text-white"
+              className={`flex flex-col items-center gap-1.5 transition-all duration-200 relative flex-1 ${
+                active ? "text-gold-dynamic" : "text-[#666] hover:text-foreground"
               }`}
             >
-              {active && (
-                <div className="absolute -top-3 w-1 h-1 bg-[#FFD700] rounded-full shadow-[0_0_8px_#FFD700]" />
-              )}
-              <Icon size={22} className={active ? "drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" : ""} />
-              <span className={`text-[8px] font-black uppercase tracking-[0.1em] leading-none ${active ? "opacity-100" : "opacity-50"}`}>
+              <Icon size={22} />
+              <span className={`text-[8px] font-black uppercase tracking-[0.1em] leading-none ${active ? "opacity-100" : "opacity-40"}`}>
                 {label.split(' ')[0]}
               </span>
             </Link>
@@ -89,12 +85,12 @@ export default function MobileNav() {
         {/* More Button */}
         <button
           onClick={() => setShowMore(!showMore)}
-          className={`flex flex-col items-center gap-1.5 transition-all duration-300 relative flex-1 ${
-            showMore ? "text-[#FFD700] scale-110" : "text-[#a0a0a0]"
+          className={`flex flex-col items-center gap-1.5 transition-all duration-200 relative flex-1 ${
+            showMore ? "text-gold-dynamic" : "text-[#666]"
           }`}
         >
           {showMore ? <X size={22} /> : <MoreHorizontal size={22} />}
-          <span className="text-[8px] font-black uppercase tracking-[0.1em] leading-none opacity-50">
+          <span className="text-[8px] font-black uppercase tracking-[0.1em] leading-none opacity-40">
             {showMore ? "Close" : "More"}
           </span>
         </button>

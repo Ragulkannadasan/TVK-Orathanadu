@@ -19,7 +19,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold display-font gradient-text">
             {mode === 'otp' ? 'Access Portal' : 'Admin Login'}
           </h1>
-          <p className="tamil text-[#FFD700]/70 text-sm mt-2">
+          <p className="tamil text-gold-dynamic/70 text-sm mt-2">
             {mode === 'otp' ? 'மின்னஞ்சல் மூலம் உள்நுழையவும்' : 'நிர்வாகி உள்நுழைவு'}
           </p>
         </div>
@@ -29,12 +29,12 @@ export default function LoginPage() {
         <div className="text-center space-y-4">
           <button 
             onClick={() => setMode(mode === 'otp' ? 'password' : 'otp')}
-            className="text-[#FFD700] text-sm hover:underline"
+            className="text-gold-dynamic text-sm hover:underline"
           >
             {mode === 'otp' ? 'Use Admin Password →' : '← Back to OTP Login'}
           </button>
           
-          <div className="text-center text-xs text-white/30 italic tamil">
+          <div className="text-center text-xs text-text-muted italic tamil">
             {mode === 'otp' ? 'புதிய பயனர்கள் மின்னஞ்சல் மூலம் நேரடியாக சேரலாம்' : 'நிர்வாக சான்றுகளைப் பயன்படுத்தவும்'}
           </div>
         </div>

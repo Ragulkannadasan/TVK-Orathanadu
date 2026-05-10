@@ -10,6 +10,7 @@ import {
   Star,
   Users,
 } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 
 
@@ -19,43 +20,48 @@ const roleColors = {
   Voter: { bg: "bg-green-500/20", text: "text-green-400", icon: Users },
 };
 
-export default function Sidebar() {
+export default function Sidebar({ user: initialUser }) {
   const { data: session } = useSession();
+  const user = initialUser || session?.user;
   const pathname = usePathname();
-  const role = session?.user?.role || "Voter";
+  const role = user?.role || "Voter";
   const items = navItems[role] || navItems.Voter;
   const roleStyle = roleColors[role] || roleColors.Voter;
   const RoleIcon = roleStyle.icon;
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-[#080808]/80 backdrop-blur-xl border-r border-white/10 sticky top-0 h-screen z-30">
+    <aside className="hidden md:flex flex-col w-64 bg-surface dark:bg-background/80 backdrop-blur-xl border-r border-surface-border sticky top-0 h-screen z-30 transition-colors shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
       {/* Logo */}
-      <div className="p-6 border-b border-white/10">
+      <div className="p-6 border-b border-surface-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#800000] flex items-center justify-center glow-maroon">
-            <span className="text-[#FFD700] font-bold text-sm">TVK</span>
+          <div className="w-10 h-10 rounded-lg bg-transparent flex items-center justify-center overflow-hidden p-0.5">
+            <img src="/icon.png" alt="TVK" className="w-full h-full object-contain" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm">TVK Orathanadu</p>
-            <p className="text-[#a0a0a0] text-xs">தொகுதி 175</p>
+            <p className="text-foreground font-bold text-sm">TVK 175</p>
+            <p className="text-text-muted text-[10px] font-black uppercase tracking-widest">ஒரத்தநாடு</p>
           </div>
         </div>
+        <ThemeToggle />
       </div>
 
       {/* User info */}
-      {session?.user && (
-        <div className="p-4 mx-3 mt-4 rounded-xl glass">
-          <p className="text-white text-sm font-semibold truncate">{session.user.name || "Member"}</p>
-          <p className="text-[#a0a0a0] text-xs truncate mt-0.5">{session.user.email}</p>
-          <div className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-xs font-medium ${roleStyle.bg} ${roleStyle.text}`}>
-            <RoleIcon size={10} />
+      {user && (
+        <div 
+          className="p-4 mx-3 mt-4 rounded-xl border border-surface-border shadow-sm transition-colors"
+          style={{ backgroundColor: 'var(--surface)' }}
+        >
+          <p className="text-foreground text-sm font-semibold truncate">{user.name || "Member"}</p>
+          <p className="text-text-muted text-[10px] truncate mt-0.5 font-medium">{user.email}</p>
+          <div className={`inline-flex items-center gap-1 mt-2.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${roleStyle.bg} ${roleStyle.text} border border-current/10`}>
+            <RoleIcon size={9} />
             {role}
           </div>
         </div>
       )}
 
       {/* Nav */}
-      <nav className="flex-1 p-3 mt-4 space-y-1">
+      <nav className="flex-1 p-3 mt-4 space-y-1 overflow-y-auto">
         {items.map(({ href, label, labelTa, icon: Icon }) => {
           const active = pathname === href;
           return (
@@ -64,24 +70,23 @@ export default function Sidebar() {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                 active
-                  ? "bg-[#800000] text-[#FFD700] shadow-lg shadow-red-900/30"
-                  : "text-[#a0a0a0] hover:bg-white/5 hover:text-white"
+                  ? "bg-maroon text-gold"
+                  : "text-text-muted hover:bg-black/5 dark:hover:bg-surface-border/10 hover:text-foreground"
               }`}
             >
-              <Icon size={18} className={active ? "text-[#FFD700]" : "group-hover:text-white"} />
+              <Icon size={18} className={active ? "text-gold" : "group-hover:text-foreground"} />
               <div>
                 <p className="text-sm font-medium leading-none">{label}</p>
-                <p className="text-[10px] mt-0.5 opacity-70 tamil">{labelTa}</p>
+                <p className="text-[10px] mt-1 opacity-50 tamil">{labelTa}</p>
               </div>
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-[#222]">
         <InstallButton />
       </div>
     </aside>
-
   );
 }

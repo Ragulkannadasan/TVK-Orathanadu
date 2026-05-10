@@ -51,24 +51,24 @@ export default function EventList({ initialEvents }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {events.length > 0 ? events.map((e) => (
-          <div key={e._id} className={`glass-card p-6 border-white/5 relative group transition-all ${!e.isActive ? "opacity-60 grayscale" : ""}`}>
+          <div key={e._id} className={`glass-card p-6 border-surface-border relative group transition-all ${!e.isActive ? "opacity-60 grayscale" : ""}`}>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white tracking-tight">{e.title}</h3>
+                <h3 className="text-xl font-bold text-foreground tracking-tight">{e.title}</h3>
                 <div className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${e.isActive ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}`}>
                   {e.isActive ? "Active" : "Closed"}
                 </div>
               </div>
               
-              <p className="text-white/60 text-sm line-clamp-2">{e.description}</p>
+              <p className="text-text-muted text-sm line-clamp-2">{e.description}</p>
               
-              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
-                <div className="flex items-center gap-2 text-white/40">
-                  <Calendar size={14} className="text-[#FFD700]" />
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-surface-border">
+                <div className="flex items-center gap-2 text-text-muted">
+                  <Calendar size={14} className="text-gold-dynamic" />
                   <span className="text-xs font-bold">{new Date(e.date).toLocaleDateString()}</span>
                 </div>
-                <div className="flex items-center gap-2 text-white/40">
-                  <MapPin size={14} className="text-[#FFD700]" />
+                <div className="flex items-center gap-2 text-text-muted">
+                  <MapPin size={14} className="text-gold-dynamic" />
                   <span className="text-xs font-bold truncate">{e.location || "Online"}</span>
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function EventList({ initialEvents }) {
                 </button>
                 <button 
                   onClick={() => handleDelete(e._id)}
-                  className="p-2 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl border border-white/5 transition-all"
+                  className="p-2 text-text-muted/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl border border-surface-border transition-all"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -90,9 +90,9 @@ export default function EventList({ initialEvents }) {
             </div>
           </div>
         )) : (
-          <div className="col-span-full glass-card p-20 text-center border-dashed border-white/10 bg-transparent">
-            <Calendar size={48} className="mx-auto text-white/10 mb-4" />
-            <p className="text-white/30 uppercase font-black tracking-widest text-xs">No events scheduled</p>
+          <div className="col-span-full glass-card p-20 text-center border-dashed border-surface-border bg-transparent">
+            <Calendar size={48} className="mx-auto text-foreground/10 mb-4" />
+            <p className="text-text-muted uppercase font-black tracking-widest text-xs">No events scheduled</p>
           </div>
         )}
       </div>
@@ -100,31 +100,31 @@ export default function EventList({ initialEvents }) {
       {/* Create Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass-card w-full max-w-md p-8 border-white/10 shadow-2xl relative">
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-white/20 hover:text-white">
+          <div className="glass-card w-full max-w-md p-8 border-surface-border shadow-2xl relative">
+            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-text-muted/50 hover:text-foreground">
               <X size={20} />
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-6 uppercase tracking-tight">Schedule Event</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6 uppercase tracking-tight">Schedule Event</h2>
             
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Event Title</label>
+                <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Event Title</label>
                 <input name="title" required className="input-dark" placeholder="e.g. General Body Meeting" />
               </div>
               
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Description</label>
+                <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Description</label>
                 <textarea name="description" className="input-dark min-h-[80px]" placeholder="What is this event about?" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Date</label>
+                  <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Date</label>
                   <input name="date" type="date" required className="input-dark" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Location</label>
+                  <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Location</label>
                   <input name="location" className="input-dark" placeholder="e.g. Town Hall" />
                 </div>
               </div>

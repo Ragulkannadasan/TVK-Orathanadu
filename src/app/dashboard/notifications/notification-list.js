@@ -11,7 +11,7 @@ export default function NotificationList({ initialNotifications, isAdmin }) {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'announcement': return <Megaphone className="text-[#FFD700]" size={18} />;
+      case 'announcement': return <Megaphone className="text-gold-dynamic" size={18} />;
       case 'warning': return <AlertTriangle className="text-red-400" size={18} />;
       case 'success': return <CheckCircle className="text-green-400" size={18} />;
       default: return <Info className="text-blue-400" size={18} />;
@@ -57,21 +57,21 @@ export default function NotificationList({ initialNotifications, isAdmin }) {
       {/* Notification List */}
       <div className="grid grid-cols-1 gap-4">
         {notifications.length > 0 ? notifications.map((n) => (
-          <div key={n._id} className="glass-card p-5 border-white/5 relative group animate-fade-in">
+          <div key={n._id} className="glass-card p-5 border-surface-border relative group animate-fade-in">
             <div className="flex gap-4">
-              <div className="mt-1 p-2 rounded-xl bg-white/5 border border-white/10 shrink-0 h-fit">
+              <div className="mt-1 p-2 rounded-xl bg-surface-border/10 border border-surface-border shrink-0 h-fit">
                 {getTypeIcon(n.type)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-white font-bold tracking-tight">{n.title}</h3>
-                  <span className="text-[10px] text-white/20 font-mono uppercase">
+                  <h3 className="text-foreground font-bold tracking-tight">{n.title}</h3>
+                  <span className="text-[10px] text-text-muted/50 font-mono uppercase">
                     {new Date(n.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-white/60 text-sm leading-relaxed mb-3">{n.message}</p>
+                <p className="text-text-muted text-sm leading-relaxed mb-3">{n.message}</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-white/5 text-white/40 border border-white/10">
+                  <span className="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-surface-border/10 text-text-muted border border-surface-border">
                     Target: {n.targetRole}
                   </span>
                 </div>
@@ -81,16 +81,16 @@ export default function NotificationList({ initialNotifications, isAdmin }) {
             {isAdmin && (
               <button 
                 onClick={() => handleDelete(n._id)}
-                className="absolute top-4 right-4 p-2 text-white/10 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                className="absolute top-4 right-4 p-2 text-foreground/10 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
               >
                 <Trash2 size={16} />
               </button>
             )}
           </div>
         )) : (
-          <div className="glass-card p-20 text-center border-dashed border-white/10 bg-transparent">
-            <Bell size={48} className="mx-auto text-white/10 mb-4" />
-            <p className="text-white/30 uppercase font-black tracking-widest text-xs">No notifications yet</p>
+          <div className="glass-card p-20 text-center border-dashed border-surface-border bg-transparent">
+            <Bell size={48} className="mx-auto text-foreground/10 mb-4" />
+            <p className="text-text-muted uppercase font-black tracking-widest text-xs">No notifications yet</p>
           </div>
         )}
       </div>
@@ -98,29 +98,29 @@ export default function NotificationList({ initialNotifications, isAdmin }) {
       {/* Broadcast Modal */}
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="glass-card w-full max-w-md p-8 border-white/10 shadow-2xl relative">
-            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-white/20 hover:text-white">
+          <div className="glass-card w-full max-w-md p-8 border-surface-border shadow-2xl relative">
+            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-text-muted/50 hover:text-foreground">
               <X size={20} />
             </button>
             
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Megaphone className="text-[#FFD700]" /> Create Broadcast
+            <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-3">
+              <Megaphone className="text-gold-dynamic" /> Create Broadcast
             </h2>
             
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Title</label>
+                <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Title</label>
                 <input name="title" required className="input-dark" placeholder="Important Announcement" />
               </div>
               
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Message</label>
+                <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Message</label>
                 <textarea name="message" required className="input-dark min-h-[100px] py-3" placeholder="Write your message here..." />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Type</label>
+                  <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Type</label>
                   <select name="type" className="input-dark bg-black/40">
                     <option value="announcement">Announcement</option>
                     <option value="info">Info</option>
@@ -129,7 +129,7 @@ export default function NotificationList({ initialNotifications, isAdmin }) {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[10px] uppercase font-bold text-white/40 ml-1">Target</label>
+                  <label className="text-[10px] uppercase font-bold text-text-muted ml-1">Target</label>
                   <select name="targetRole" className="input-dark bg-black/40">
                     <option value="All">Everyone</option>
                     <option value="Voter">Voters Only</option>
