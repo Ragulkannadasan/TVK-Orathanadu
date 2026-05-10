@@ -9,8 +9,10 @@ export default function LogoutButton({ className }) {
 
   const handleLogout = async () => {
     setLoading(true);
-    // Use window.location.origin to ensure it redirects to the current domain (Vercel or Local)
-    await signOut({ callbackUrl: window.location.origin });
+    // Use redirect: false to prevent NextAuth from using its internal redirect logic
+    // and manually redirect to '/' via the browser.
+    await signOut({ redirect: false });
+    window.location.href = "/";
   };
 
   return (
