@@ -62,18 +62,31 @@ export default function LightChatPage() {
     router.push("/dashboard");
   };
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim() || sending) return;
+  const handleSend = async (e, attachment = null) => {
+    if (e) e.preventDefault();
+    if ((!input.trim() && !attachment) || sending) return;
 
     setSending(true);
     const tempInput = input;
-    setInput("");
+    if (!attachment) setInput("");
     
-    const res = await sendMessage(tempInput);
-    if (res.error) {
-      alert(res.error);
-      setInput(tempInput);
+    try {
+      const res = await fetch('https://tvk-api-server.onrender.com/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: tempInput,
+          senderEmail: session.user.email,
+          senderName: session.user.name || "Anonymous",
+          role: session.user.role || 'Admin',
+          attachment: attachment
+        })
+      });
+      const data = await res.json();
+      if (data.error) alert(data.error);
+    } catch (err) {
+      console.error("Send error:", err);
+      if (!attachment) setInput(tempInput);
     }
     setSending(false);
   };
@@ -212,7 +225,7 @@ export default function LightChatPage() {
                 const uploadData = await res.json();
                 
                 if (uploadData.url) {
-                  await sendMessage("", uploadData);
+                  await handleSend(null, uploadData);
                 }
               } catch (err) {
                 alert("Upload failed");
