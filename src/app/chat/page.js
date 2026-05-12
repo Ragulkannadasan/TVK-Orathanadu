@@ -191,7 +191,42 @@ export default function LightChatPage() {
             <span className="text-[8px] font-black uppercase tracking-widest text-gold-dynamic">Sending...</span>
           </div>
         )}
-        <form onSubmit={handleSend} className="flex gap-2">
+        <form onSubmit={handleSend} className="flex gap-2 items-center">
+          <input
+            type="file"
+            id="file-upload"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              
+              setSending(true);
+              const formData = new FormData();
+              formData.append('file', file);
+              
+              try {
+                const res = await fetch('https://tvk-api-server.onrender.com/api/chat/upload', {
+                  method: 'POST',
+                  body: formData
+                });
+                const uploadData = await res.json();
+                
+                if (uploadData.url) {
+                  await sendMessage("", uploadData);
+                }
+              } catch (err) {
+                alert("Upload failed");
+              } finally {
+                setSending(false);
+              }
+            }}
+          />
+          <label 
+            htmlFor="file-upload"
+            className="p-2 cursor-pointer hover:bg-surface-border/20 rounded-full transition-all text-text-muted hover:text-gold-dynamic"
+          >
+            <Send size={20} className="rotate-[-45deg]" /> {/* Using Send as a proxy for paperclip if icon missing, or use Lucide Paperclip */}
+          </label>
           <input
             type="text"
             value={input}
