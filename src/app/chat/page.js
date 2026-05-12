@@ -155,6 +155,26 @@ export default function LightChatPage() {
                     ? "bg-maroon text-white rounded-tr-none border border-maroon-dark" 
                     : "bg-surface border border-surface-border text-foreground rounded-tl-none backdrop-blur-sm"
                 }`}>
+                  {msg.attachment && (
+                    <a 
+                      href={`https://tvk-api-server.onrender.com${msg.attachment.url}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-3 p-2 mb-2 rounded-lg border transition-all ${
+                        isMe ? "bg-white/10 border-white/20 hover:bg-white/20" : "bg-surface-border/5 border-surface-border hover:bg-surface-border/10"
+                      }`}
+                    >
+                      <div className="p-2 rounded bg-gold-dynamic/20">
+                        <User size={16} className="text-gold-dynamic" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[10px] font-bold truncate ${isMe ? "text-white" : "text-foreground"}`}>
+                          {msg.attachment.name}
+                        </p>
+                        <p className="text-[8px] opacity-60 uppercase font-black">Download Attachment</p>
+                      </div>
+                    </a>
+                  )}
                   {msg.content}
                 </div>
               </div>
