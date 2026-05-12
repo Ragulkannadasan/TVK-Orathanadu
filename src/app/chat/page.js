@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { getMessages, sendMessage } from "@/actions/chat";
 import { ArrowLeft, Send, User, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import io from "socket.io-client";
+
+const RENDER_WS_URL = 'https://tvk-api-server.onrender.com';
 
 export default function LightChatPage() {
   const { data: session } = useSession();
@@ -15,6 +18,7 @@ export default function LightChatPage() {
   const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
   const scrollRef = useRef(null);
+  const socketRef = useRef(null);
 
   const fetchMessages = async () => {
     const data = await getMessages(50);
@@ -26,8 +30,25 @@ export default function LightChatPage() {
 
   useEffect(() => {
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000); // 5s polling
-    return () => clearInterval(interval);
+
+    // Initialize Socket.io
+    socketRef.current = io(RENDER_WS_URL);
+
+    socketRef.current.on('connect', () => {
+      socketRef.current.emit('join_chat');
+    });
+
+    socketRef.current.on('receive_message', (newMessage) => {
+      setMessages((prev) => {
+        const exists = prev.find(m => m._id === newMessage._id);
+        if (exists) return prev;
+        return [...prev, newMessage];
+      });
+    });
+
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -53,8 +74,6 @@ export default function LightChatPage() {
     if (res.error) {
       alert(res.error);
       setInput(tempInput);
-    } else {
-      await fetchMessages();
     }
     setSending(false);
   };
