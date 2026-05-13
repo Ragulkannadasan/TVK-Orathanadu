@@ -101,16 +101,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           if (user) {
-            const jwt = (await import("jsonwebtoken")).default;
-            const tvkToken = jwt.sign(
-              { _id: user.id || user._id, email: user.email, role: user.role },
-              process.env.JWT_SECRET || 'tvk_super_secret_key_2026',
-              { expiresIn: '30d' }
-            );
-
             return {
-              ...user,
-              tvkToken
+              id: user._id?.toString() || user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
             };
           }
         } catch (error) {

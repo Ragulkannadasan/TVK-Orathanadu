@@ -5,14 +5,24 @@ import Chat from "@/models/Message";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'tvk_super_secret_key_2026';
+
 export async function getMessages(limit = 50) {
   try {
     const session = await auth();
-    if (!session?.user?.tvkToken) return { error: "Unauthorized" };
+    if (!session?.user) return { error: "Unauthorized" };
+
+    const tvkToken = jwt.sign(
+      { _id: session.user.id, email: session.user.email, role: session.user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     const response = await fetch(`https://tvk-api-server.onrender.com/api/chat?limit=${limit}`, {
       headers: {
-        'Authorization': `Bearer ${session.user.tvkToken}`
+        'Authorization': `Bearer ${tvkToken}`
       }
     });
 
@@ -29,15 +39,21 @@ export async function getMessages(limit = 50) {
 export async function sendMessage(content, attachment = null) {
   try {
     const session = await auth();
-    if (!session?.user?.tvkToken) return { error: "Authentication required" };
+    if (!session?.user) return { error: "Authentication required" };
 
     if (!content && !attachment) return { error: "Message cannot be empty" };
+
+    const tvkToken = jwt.sign(
+      { _id: session.user.id, email: session.user.email, role: session.user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
     const response = await fetch('https://tvk-api-server.onrender.com/api/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.user.tvkToken}`
+        'Authorization': `Bearer ${tvkToken}`
       },
       body: JSON.stringify({
         content: content?.trim(),

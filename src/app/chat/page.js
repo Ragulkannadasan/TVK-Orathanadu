@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getMessages, sendMessage } from "@/actions/chat";
+import { getClientToken } from "@/actions/token";
 import { ArrowLeft, Send, User, Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
@@ -19,6 +20,7 @@ export default function LightChatPage() {
   const router = useRouter();
   const scrollRef = useRef(null);
   const socketRef = useRef(null);
+  const [token, setToken] = useState(null);
 
   const fetchMessages = async () => {
     const data = await getMessages(50);
@@ -29,14 +31,22 @@ export default function LightChatPage() {
   };
 
   useEffect(() => {
+    const initToken = async () => {
+      const t = await getClientToken();
+      setToken(t);
+    };
+    initToken();
+  }, []);
+
+  useEffect(() => {
     fetchMessages();
 
     // Initialize Socket.io
-    if (session?.user?.tvkToken) {
+    if (token) {
       socketRef.current = io(RENDER_WS_URL, {
         transports: ['websocket'],
         auth: {
-          token: session.user.tvkToken
+          token: token
         }
       });
 
@@ -56,7 +66,7 @@ export default function LightChatPage() {
     return () => {
       if (socketRef.current) socketRef.current.disconnect();
     };
-  }, [session]);
+  }, [token]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -173,10 +183,10 @@ export default function LightChatPage() {
                       return (
                         <div className="mb-2 rounded-lg overflow-hidden border border-white/10">
                           <img 
-                            src={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`} 
+                            src={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${token}`} 
                             alt={msg.attachment.name}
                             className="max-w-full h-auto object-cover max-h-[300px] cursor-pointer hover:opacity-90 transition-opacity"
-                            onClick={() => window.open(`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`, '_blank')}
+                            onClick={() => window.open(`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${token}`, '_blank')}
                           />
                         </div>
                       );
@@ -184,7 +194,7 @@ export default function LightChatPage() {
 
                     return (
                       <a 
-                        href={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`} 
+                        href={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${token}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className={`flex items-center gap-3 p-2 mb-2 rounded-lg border transition-all ${
