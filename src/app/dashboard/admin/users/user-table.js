@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { deleteUser, updateUserRole } from "@/actions/admin";
-import { X, User as UserIcon, Phone, CreditCard, MapPin, Hash, Calendar } from "lucide-react";
+import { deleteUser, updateUserRole, bulkDeleteUsers, bulkUpdateRoles } from "@/actions/admin";
+import { X, User as UserIcon, Phone, CreditCard, MapPin, Hash, Calendar, Download, Trash, Shield, CheckSquare, Square } from "lucide-react";
 
 export default function UserTable({ initialUsers, currentUserEmail, pagination }) {
   const [users, setUsers] = useState(initialUsers);
@@ -11,6 +11,8 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleUser, setRoleUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState(pagination.search || "");
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
 
   const handleDelete = async (userId) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
@@ -36,6 +38,67 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
       alert(res.error || "Failed to update role");
     }
     setLoading(null);
+  };
+  const toggleSelectAll = () => {
+    if (selectedIds.length === users.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(users.map(u => u._id));
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} users?`)) return;
+    setIsBulkLoading(true);
+    const res = await bulkDeleteUsers(selectedIds);
+    if (res.success) {
+      setUsers(users.filter(u => !selectedIds.includes(u._id)));
+      setSelectedIds([]);
+    } else {
+      alert(res.error || "Bulk delete failed");
+    }
+    setIsBulkLoading(false);
+  };
+
+  const handleBulkRoleUpdate = async (newRole) => {
+    setIsBulkLoading(true);
+    const res = await bulkUpdateRoles(selectedIds, newRole);
+    if (res.success) {
+      setUsers(users.map(u => selectedIds.includes(u._id) ? { ...u, role: newRole } : u));
+      setSelectedIds([]);
+    } else {
+      alert(res.error || "Bulk update failed");
+    }
+    setIsBulkLoading(false);
+  };
+
+  const handleExportCSV = () => {
+    const headers = ["Name", "Email", "Mobile", "Role", "Panchayat", "Booth", "Joined"];
+    const csvContent = [
+      headers.join(","),
+      ...users.map(u => [
+        `"${u.name || 'N/A'}"`,
+        `"${u.email}"`,
+        `"${u.mobile || 'N/A'}"`,
+        `"${u.role}"`,
+        `"${u.panchayat || 'N/A'}"`,
+        `"${u.boothNumber || 'N/A'}"`,
+        `"${new Date(u.createdAt).toLocaleDateString()}"`
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `tvk_members_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const getRoleBadge = (role, size = "sm") => {
@@ -87,6 +150,13 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
             className="flex-1 input-dark bg-surface/50 border-surface-border text-sm"
           />
           <button type="submit" className="btn-primary py-2 px-6 text-xs">Search</button>
+          <button 
+            type="button" 
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-foreground/70 hover:bg-white/10 transition-all"
+          >
+            <Download size={14} /> Export CSV
+          </button>
         </form>
       </div>
       {/* Desktop Table View */}
@@ -94,6 +164,11 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
         <table className="w-full text-left border-separate border-spacing-y-3">
           <thead>
             <tr className="text-text-muted text-xs uppercase tracking-wider">
+              <th className="px-6 py-2">
+                <button onClick={toggleSelectAll} className="text-gold-dynamic hover:scale-110 transition-transform">
+                  {selectedIds.length === users.length ? <CheckSquare size={18} /> : <Square size={18} />}
+                </button>
+              </th>
               <th className="px-6 py-2">User / Member</th>
               <th className="px-6 py-2">Details</th>
               <th className="px-6 py-2">Role / Badge</th>
@@ -104,8 +179,13 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
             {users.map((user) => {
               const isSelf = user.email === currentUserEmail;
               return (
-                <tr key={user._id} className="glass-card-no-hover animate-fade-in group">
-                  <td className="px-6 py-4 rounded-l-2xl cursor-pointer" onClick={() => setSelectedUser(user)}>
+                <tr key={user._id} className={`glass-card-no-hover animate-fade-in group ${selectedIds.includes(user._id) ? "border-gold-dynamic/50 bg-gold-dynamic/5" : ""}`}>
+                  <td className="px-6 py-4 rounded-l-2xl">
+                    <button onClick={() => toggleSelect(user._id)} className="text-text-muted/50 hover:text-gold-dynamic transition-colors">
+                      {selectedIds.includes(user._id) ? <CheckSquare size={18} className="text-gold-dynamic" /> : <Square size={18} />}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 cursor-pointer" onClick={() => setSelectedUser(user)}>
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700]">
@@ -438,6 +518,51 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
           </button>
         </div>
       </div>
+      {/* Bulk Actions Bar */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+          <div className="bg-surface/90 backdrop-blur-xl border border-gold-dynamic/30 rounded-2xl px-6 py-4 flex items-center gap-6 shadow-2xl">
+            <div className="flex items-center gap-2">
+              <span className="bg-gold-dynamic text-black font-black px-2 py-0.5 rounded text-[10px]">{selectedIds.length}</span>
+              <span className="text-xs font-bold text-foreground">Selected</span>
+            </div>
+            
+            <div className="h-4 w-[1px] bg-white/10" />
+            
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => handleBulkRoleUpdate('Poruppalar')}
+                disabled={isBulkLoading}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gold-dynamic/10 text-gold-dynamic text-[10px] font-black uppercase hover:bg-gold-dynamic/20 transition-all disabled:opacity-50"
+              >
+                <Shield size={12} /> Make Poruppalar
+              </button>
+              
+              <button 
+                onClick={() => handleBulkRoleUpdate('Voter')}
+                disabled={isBulkLoading}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-foreground/70 text-[10px] font-black uppercase hover:bg-white/10 transition-all disabled:opacity-50"
+              >
+                <Shield size={12} /> Reset to Voter
+              </button>
+            </div>
+
+            <div className="h-4 w-[1px] bg-white/10" />
+
+            <button 
+              onClick={handleBulkDelete}
+              disabled={isBulkLoading}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-500 text-[10px] font-black uppercase hover:bg-red-500/20 transition-all disabled:opacity-50"
+            >
+              <Trash size={12} /> Bulk Delete
+            </button>
+
+            <button onClick={() => setSelectedIds([])} className="text-text-muted/50 hover:text-foreground">
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

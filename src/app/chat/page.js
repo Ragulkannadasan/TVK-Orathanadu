@@ -58,11 +58,6 @@ export default function LightChatPage() {
     };
   }, [session]);
 
-    return () => {
-      if (socketRef.current) socketRef.current.disconnect();
-    };
-  }, []);
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -83,19 +78,8 @@ export default function LightChatPage() {
     if (!attachment) setInput("");
     
     try {
-      const res = await fetch('https://tvk-api-server.onrender.com/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: tempInput,
-          senderEmail: session.user.email,
-          senderName: session.user.name || "Anonymous",
-          role: session.user.role || 'Admin',
-          attachment: attachment
-        })
-      });
-      const data = await res.json();
-      if (data.error) alert(data.error);
+      const res = await sendMessage(tempInput, attachment);
+      if (res.error) alert(res.error);
     } catch (err) {
       console.error("Send error:", err);
       if (!attachment) setInput(tempInput);
@@ -251,6 +235,9 @@ export default function LightChatPage() {
               try {
                 const res = await fetch('https://tvk-api-server.onrender.com/api/chat/upload', {
                   method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${session?.user?.tvkToken}`
+                  },
                   body: formData
                 });
                 const uploadData = await res.json();

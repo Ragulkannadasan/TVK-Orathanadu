@@ -106,3 +106,42 @@ export async function deleteGrievance(grievanceId) {
     return { error: error.message };
   }
 }
+export async function bulkDeleteUsers(userIds) {
+  try {
+    await checkAdmin();
+    await dbConnect();
+    
+    // Safety check: Cannot delete admins or self
+    const session = await auth();
+    const targetUsers = await User.find({ _id: { $in: userIds } });
+    const safeIds = targetUsers
+      .filter(u => u.email !== "admin@tvk.com" && u._id.toString() !== session.user.id)
+      .map(u => u._id);
+
+    await User.deleteMany({ _id: { $in: safeIds } });
+    revalidatePath("/dashboard/admin/users");
+    return { success: true, count: safeIds.length };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+export async function bulkUpdateRoles(userIds, newRole) {
+  try {
+    await checkAdmin();
+    await dbConnect();
+    
+    const allowedRoles = ['Voter', 'Poruppalar', 'Admin', 'MLA', 'DistSecretary'];
+    if (!allowedRoles.includes(newRole)) throw new Error("Invalid role");
+
+    await User.updateMany(
+      { _id: { $in: userIds }, email: { $ne: "admin@tvk.com" } },
+      { role: newRole }
+    );
+    
+    revalidatePath("/dashboard/admin/users");
+    return { success: true };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
