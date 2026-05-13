@@ -8,46 +8,53 @@ import { revalidatePath } from "next/cache";
 export async function getMessages(limit = 50) {
   try {
     const session = await auth();
-    if (!session) return { error: "Unauthorized" };
+    if (!session?.user?.tvkToken) return { error: "Unauthorized" };
 
-    await dbConnect();
-    const messages = await Chat.find()
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean();
+    const response = await fetch(`https://tvk-api-server.onrender.com/api/chat?limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${session.user.tvkToken}`
+      }
+    });
 
-    // Reverse to get chronological order for the UI
-    return JSON.parse(JSON.stringify(messages.reverse()));
+    const messages = await response.json();
+    if (!response.ok) throw new Error(messages.error || "Failed to fetch");
+
+    return messages;
   } catch (error) {
     console.error("Chat fetch error:", error);
-    return { error: "Failed to fetch messages" };
+    return { error: error.message };
   }
 }
 
-export async function sendMessage(content) {
+export async function sendMessage(content, attachment = null) {
   try {
     const session = await auth();
-    if (!session?.user) return { error: "Authentication required" };
+    if (!session?.user?.tvkToken) return { error: "Authentication required" };
 
-    if (!content || content.trim().length === 0) return { error: "Message cannot be empty" };
+    if (!content && !attachment) return { error: "Message cannot be empty" };
 
-    await dbConnect();
-    
-    const messageData = {
-      senderEmail: session.user.email,
-      senderName: session.user.name || "Anonymous",
-      content: content.trim(),
-      role: session.user.role || 'Voter',
-    };
+    const response = await fetch('https://tvk-api-server.onrender.com/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.user.tvkToken}`
+      },
+      body: JSON.stringify({
+        content: content?.trim(),
+        senderEmail: session.user.email,
+        senderName: session.user.name || "Anonymous",
+        role: session.user.role || 'Voter',
+        attachment
+      }),
+    });
 
-    console.log("Attempting to save message:", { ...messageData, content: "[HIDDEN]" });
-
-    const newMessage = await Chat.create(messageData);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Failed to send");
 
     revalidatePath("/chat");
-    return { success: true, message: JSON.parse(JSON.stringify(newMessage)) };
+    return { success: true, message: data };
   } catch (error) {
-    console.error("CRITICAL SEND ERROR:", error);
-    return { error: error.message || "Failed to send message. Please check your connection." };
+    console.error("SEND ERROR:", error);
+    return { error: error.message };
   }
 }

@@ -5,6 +5,7 @@ export default {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+        token.tvkToken = user.tvkToken;
       }
       return token;
     },
@@ -12,6 +13,7 @@ export default {
       if (session.user) {
         session.user.role = token.role;
         session.user.id = token.id;
+        session.user.tvkToken = token.tvkToken;
       }
       return session;
     }

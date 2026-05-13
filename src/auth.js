@@ -26,6 +26,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           await dbConnect();
 
+          let user = null;
+
           // --- OTP FLOW ---
           if (credentials.flow === "otp") {
             const OTPModule = await import("@/models/OTP");
@@ -34,11 +36,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const otpRecord = await OTP.findOne({ email: credentials.email, otp: credentials.otp });
             if (!otpRecord) return null;
 
-            // OTP is valid, delete it
             await OTP.deleteOne({ _id: otpRecord._id });
 
-            // Find or create user
-            let user = await User.findOne({ email: credentials.email }).lean();
+            user = await User.findOne({ email: credentials.email }).lean();
             if (!user) {
               const { nanoid } = await import("nanoid");
               const bcrypt = (await import("bcryptjs")).default;
@@ -53,81 +53,72 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               await user.save();
               user = user.toObject();
             }
+          } else {
+            // --- PASSWORD FLOW ---
+            if (!credentials.password) return null;
 
-            return {
-              id: user._id.toString(),
-              name: user.name,
-              email: user.email,
-              role: user.role,
-            };
-          }
+            // 1. Check environment variables
+            const adminEmail = process.env.ADMIN_EMAIL;
+            const adminPass = process.env.ADMIN_PASSWORD;
 
-          // --- PASSWORD FLOW ---
-          if (!credentials.password) return null;
-
-          // 1. Check environment variables first (most secure for Vercel)
-          const adminEmail = process.env.ADMIN_EMAIL;
-          const adminPass = process.env.ADMIN_PASSWORD;
-
-          if (adminEmail && adminPass && 
-              credentials.email === adminEmail && 
-              credentials.password === adminPass) {
-            console.log("Authenticated via Environment Variables:", adminEmail);
-            return {
-              id: "admin-env",
-              name: "System Admin",
-              email: adminEmail,
-              role: "Admin",
-            };
-          }
-
-          // 2. Fallback to local users.json (now bundled via import)
-          const localUser = localUsers.find(u => u.email === credentials.email && u.password === credentials.password);
-
-          if (localUser) {
-            // Check DB for any overrides (like profile image)
-            let dbImage = localUser.image;
-            try {
-              const dbUser = await User.findOne({ email: localUser.email }).lean();
-              if (dbUser?.image) dbImage = dbUser.image;
-            } catch (e) {
-              console.error("Auth DB Error (ignoring):", e);
-            }
-
-            console.log("Authenticated via users.json:", localUser.email);
-
-            return {
-              id: localUser.email,
-              name: localUser.name,
-              email: localUser.email,
-              role: localUser.role,
-            };
-          }
-
-          // 3. Database User
-          const bcrypt = (await import("bcryptjs")).default;
-          const dbUser = await User.findOne({ email: credentials.email }).select("+password").lean();
-          
-          if (dbUser && dbUser.password) {
-            const isPasswordCorrect = await bcrypt.compare(credentials.password, dbUser.password);
-            if (isPasswordCorrect) {
-              return {
-                id: dbUser._id.toString(),
-                name: dbUser.name,
-                email: dbUser.email,
-                role: dbUser.role,
+            if (adminEmail && adminPass && 
+                credentials.email === adminEmail && 
+                credentials.password === adminPass) {
+              user = {
+                id: "admin-env",
+                name: "System Admin",
+                email: adminEmail,
+                role: "Admin",
               };
+            } else {
+              // 2. Check users.json
+              const localUser = localUsers.find(u => u.email === credentials.email && u.password === credentials.password);
+              if (localUser) {
+                user = {
+                  id: localUser.email,
+                  name: localUser.name,
+                  email: localUser.email,
+                  role: localUser.role,
+                };
+              } else {
+                // 3. Database User
+                const bcrypt = (await import("bcryptjs")).default;
+                const dbUser = await User.findOne({ email: credentials.email }).select("+password").lean();
+                
+                if (dbUser && dbUser.password) {
+                  const isPasswordCorrect = await bcrypt.compare(credentials.password, dbUser.password);
+                  if (isPasswordCorrect) {
+                    user = {
+                      id: dbUser._id.toString(),
+                      name: dbUser.name,
+                      email: dbUser.email,
+                      role: dbUser.role,
+                    };
+                  }
+                }
+              }
             }
+          }
+
+          if (user) {
+            const jwt = (await import("jsonwebtoken")).default;
+            const tvkToken = jwt.sign(
+              { _id: user.id || user._id, email: user.email, role: user.role },
+              process.env.JWT_SECRET || 'tvk_super_secret_key_2026',
+              { expiresIn: '30d' }
+            );
+
+            return {
+              ...user,
+              tvkToken
+            };
           }
         } catch (error) {
           console.error("Critical Auth Error:", error);
-          // In production, we don't want to leak error details, but we should log them for debugging
         }
 
-        console.log("Authentication failed for:", credentials.email);
         return null;
       }
     })
   ],
 });
-

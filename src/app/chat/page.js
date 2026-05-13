@@ -32,19 +32,31 @@ export default function LightChatPage() {
     fetchMessages();
 
     // Initialize Socket.io
-    socketRef.current = io(RENDER_WS_URL);
-
-    socketRef.current.on('connect', () => {
-      socketRef.current.emit('join_chat');
-    });
-
-    socketRef.current.on('receive_message', (newMessage) => {
-      setMessages((prev) => {
-        const exists = prev.find(m => m._id === newMessage._id);
-        if (exists) return prev;
-        return [...prev, newMessage];
+    if (session?.user?.tvkToken) {
+      socketRef.current = io(RENDER_WS_URL, {
+        transports: ['websocket'],
+        auth: {
+          token: session.user.tvkToken
+        }
       });
-    });
+
+      socketRef.current.on('connect', () => {
+        socketRef.current.emit('join_chat');
+      });
+
+      socketRef.current.on('receive_message', (newMessage) => {
+        setMessages((prev) => {
+          const exists = prev.find(m => m._id === newMessage._id);
+          if (exists) return prev;
+          return [...prev, newMessage];
+        });
+      });
+    }
+
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
+  }, [session]);
 
     return () => {
       if (socketRef.current) socketRef.current.disconnect();
@@ -168,26 +180,45 @@ export default function LightChatPage() {
                     ? "bg-maroon text-white rounded-tr-none border border-maroon-dark" 
                     : "bg-surface border border-surface-border text-foreground rounded-tl-none backdrop-blur-sm"
                 }`}>
-                  {msg.attachment && (
-                    <a 
-                      href={`https://tvk-api-server.onrender.com${msg.attachment.url}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`flex items-center gap-3 p-2 mb-2 rounded-lg border transition-all ${
-                        isMe ? "bg-white/10 border-white/20 hover:bg-white/20" : "bg-surface-border/5 border-surface-border hover:bg-surface-border/10"
-                      }`}
-                    >
-                      <div className="p-2 rounded bg-gold-dynamic/20">
-                        <User size={16} className="text-gold-dynamic" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[10px] font-bold truncate ${isMe ? "text-white" : "text-foreground"}`}>
-                          {msg.attachment.name}
-                        </p>
-                        <p className="text-[8px] opacity-60 uppercase font-black">Download Attachment</p>
-                      </div>
-                    </a>
-                  )}
+                  {msg.attachment && (() => {
+                    const isImg = msg.attachment.mimeType?.startsWith('image/') || 
+                                  msg.attachment.type?.startsWith('image/') ||
+                                  /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.attachment.url);
+                    
+                    if (isImg) {
+                      return (
+                        <div className="mb-2 rounded-lg overflow-hidden border border-white/10">
+                          <img 
+                            src={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`} 
+                            alt={msg.attachment.name}
+                            className="max-w-full h-auto object-cover max-h-[300px] cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`, '_blank')}
+                          />
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <a 
+                        href={`https://tvk-api-server.onrender.com${msg.attachment.url}?token=${session?.user?.tvkToken}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`flex items-center gap-3 p-2 mb-2 rounded-lg border transition-all ${
+                          isMe ? "bg-white/10 border-white/20 hover:bg-white/20" : "bg-surface-border/5 border-surface-border hover:bg-surface-border/10"
+                        }`}
+                      >
+                        <div className="p-2 rounded bg-gold-dynamic/20">
+                          <User size={16} className="text-gold-dynamic" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-[10px] font-bold truncate ${isMe ? "text-white" : "text-foreground"}`}>
+                            {msg.attachment.name}
+                          </p>
+                          <p className="text-[8px] opacity-60 uppercase font-black">Download Attachment</p>
+                        </div>
+                      </a>
+                    );
+                  })()}
                   {msg.content}
                 </div>
               </div>
