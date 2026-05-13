@@ -49,7 +49,7 @@ export default async function AdminUsersPage({ searchParams }) {
     panchayat: u.panchayat || '',
     image: u.image || '',
     username: u.username || '',
-    createdAt: u.createdAt ? u.createdAt.toISOString() : new Date().toISOString()
+    createdAt: u.createdAt ? new Date(u.createdAt).toISOString() : new Date().toISOString()
   }));
 
   const totalPages = Math.ceil(totalCount / limit);

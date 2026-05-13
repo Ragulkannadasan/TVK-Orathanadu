@@ -28,7 +28,7 @@ export default async function VoterDashboard() {
     ...g,
     _id: g._id.toString(),
     userId: g.userId.toString(),
-    createdAt: g.createdAt?.toISOString(),
+    createdAt: g.createdAt ? new Date(g.createdAt).toISOString() : new Date().toISOString(),
   }));
 
   const counts = await Grievance.aggregate([

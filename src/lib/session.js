@@ -40,7 +40,7 @@ export const getSessionUser = cache(async () => {
     return {
       ...user,
       _id: user._id.toString(),
-      createdAt: user.createdAt?.toISOString(),
+      createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString(),
     };
   } catch (error) {
     console.error("getSessionUser Error:", error);

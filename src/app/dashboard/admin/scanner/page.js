@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { verifyUserAction } from "@/actions/verification";
 import { getEvents } from "@/actions/event";
@@ -169,8 +170,12 @@ export default function ScannerPage() {
 
                 <div className="bg-surface-border/10 rounded-2xl p-6 border border-surface-border space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-[#1a1a1a] border border-[#FFD700]/20 flex items-center justify-center overflow-hidden">
-                      {result.image ? <img src={result.image} className="w-full h-full object-cover" /> : <User className="text-gold-dynamic" size={20} />}
+                    <div className="w-12 h-12 rounded-full bg-[#1a1a1a] border border-[#FFD700]/20 flex items-center justify-center overflow-hidden relative">
+                      {result.image ? (
+                        <Image src={result.image} alt={result.name} fill sizes="48px" className="object-cover" />
+                      ) : (
+                        <User className="text-gold-dynamic" size={20} />
+                      )}
                     </div>
                     <div className="text-left">
                       <p className="text-foreground font-bold text-lg leading-none">{result.name}</p>

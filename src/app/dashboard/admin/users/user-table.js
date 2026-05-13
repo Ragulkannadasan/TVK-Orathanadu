@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { deleteUser, updateUserRole } from "@/actions/admin";
 import { X, User as UserIcon, Phone, CreditCard, MapPin, Hash, Calendar } from "lucide-react";
 
@@ -109,9 +110,9 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
                       <div className="relative">
                         <div className="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700]">
                           <div className="w-full h-full rounded-full bg-background p-0.5">
-                            <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border">
+                            <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border relative">
                               {user.image ? (
-                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                <Image src={user.image} alt={user.name} fill sizes="40px" className="object-cover" />
                               ) : (
                                 <span className="text-foreground font-bold text-xs">{user.name?.[0]?.toUpperCase()}</span>
                               )}
@@ -191,9 +192,9 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
                 <div className="relative shrink-0" onClick={() => setSelectedUser(user)}>
                   <div className="w-14 h-14 rounded-full p-0.5 bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700]">
                     <div className="w-full h-full rounded-full bg-background p-0.5">
-                      <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border">
+                      <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border relative">
                         {user.image ? (
-                          <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                          <Image src={user.image} alt={user.name} fill sizes="56px" className="object-cover" />
                         ) : (
                           <span className="text-foreground font-bold text-lg">{user.name?.[0]?.toUpperCase()}</span>
                         )}
@@ -285,9 +286,9 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
                     {/* Instagram Profile Photo */}
                     <div className="relative w-24 h-24 p-1 rounded-full bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] mb-4">
                       <div className="w-full h-full rounded-full bg-background p-1">
-                        <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border">
+                        <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border relative">
                           {selectedUser.image ? (
-                            <img src={selectedUser.image} alt={selectedUser.name} className="w-full h-full object-cover" />
+                            <Image src={selectedUser.image} alt={selectedUser.name} fill sizes="96px" className="object-cover" />
                           ) : (
                             <span className="text-foreground font-bold text-3xl">{selectedUser.name?.[0]?.toUpperCase()}</span>
                           )}
@@ -356,9 +357,9 @@ export default function UserTable({ initialUsers, currentUserEmail, pagination }
               <div className="flex flex-col items-center mb-10">
                  <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-[#FFD700] via-[#800000] to-[#FFD700] mb-4 shadow-2xl shadow-[#FFD700]/10">
                     <div className="w-full h-full rounded-full bg-background p-1">
-                       <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border">
+                       <div className="w-full h-full rounded-full bg-surface flex items-center justify-center overflow-hidden border border-surface-border relative">
                           {roleUser.image ? (
-                             <img src={roleUser.image} alt={roleUser.name} className="w-full h-full object-cover" />
+                             <Image src={roleUser.image} alt={roleUser.name} fill sizes="80px" className="object-cover" />
                           ) : (
                              <span className="text-foreground font-bold text-2xl">{roleUser.name?.[0]?.toUpperCase()}</span>
                           )}
