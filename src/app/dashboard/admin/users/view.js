@@ -4,20 +4,15 @@ import UserTable from "./user-table";
 import { getSession } from "@/lib/session";
 
 export default async function AdminUsersPage({ searchParams }) {
-  console.time("AdminUsersPage_Total");
   const params = await searchParams;
   const page = parseInt(params.page) || 1;
   const search = (params.search || "").trim();
   const limit = 10;
   const skip = (page - 1) * limit;
 
-  console.time("AdminUsersPage_DB_Connect");
   await dbConnect();
-  console.timeEnd("AdminUsersPage_DB_Connect");
 
-  console.time("AdminUsersPage_Session");
   const session = await getSession();
-  console.timeEnd("AdminUsersPage_Session");
 
   // Build query
   const query = search ? {
@@ -28,7 +23,6 @@ export default async function AdminUsersPage({ searchParams }) {
     ]
   } : {};
 
-  console.time("AdminUsersPage_Query");
   // Temporarily removed .sort({ createdAt: -1 }) to test performance
   const [users, totalCount] = await Promise.all([
     User.find(query)
@@ -38,7 +32,6 @@ export default async function AdminUsersPage({ searchParams }) {
       .lean(),
     search ? User.countDocuments(query) : User.estimatedDocumentCount()
   ]);
-  console.timeEnd("AdminUsersPage_Query");
   
   const serializedUsers = users.map(u => ({
     _id: u._id.toString(),
@@ -53,7 +46,6 @@ export default async function AdminUsersPage({ searchParams }) {
   }));
 
   const totalPages = Math.ceil(totalCount / limit);
-  console.timeEnd("AdminUsersPage_Total");
 
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto pb-20">

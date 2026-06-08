@@ -25,18 +25,26 @@ export default auth((req) => {
   }
 
   if (isLoggedIn) {
-    const role = req.auth.user.role;
     const pathname = nextUrl.pathname;
 
-    // Strict Role-Based Protection
-    if (pathname.startsWith('/dashboard/admin') && role !== 'Admin') {
-      return Response.redirect(new URL('/dashboard', nextUrl));
+    // Redirect legacy routes to the SPA shell tabs
+    if (pathname === '/chat') {
+      return Response.redirect(new URL('/dashboard?tab=chat', nextUrl));
     }
-    if (pathname.startsWith('/dashboard/leader') && role !== 'Poruppalar') {
-      return Response.redirect(new URL('/dashboard', nextUrl));
-    }
-    if (pathname.startsWith('/dashboard/voter') && role !== 'Voter') {
-      return Response.redirect(new URL('/dashboard', nextUrl));
+
+    if (pathname.startsWith('/dashboard/') && pathname !== '/dashboard') {
+      const parts = pathname.split('/').filter(Boolean);
+      let tabId = parts[parts.length - 1];
+      
+      // Map legacy role dashboard paths back to main dashboard tab
+      if (tabId === 'voter' || tabId === 'leader' || tabId === 'admin') {
+        tabId = 'dashboard';
+      }
+      if (tabId === 'booth') {
+        tabId = 'booth-grievances';
+      }
+
+      return Response.redirect(new URL(`/dashboard?tab=${tabId}`, nextUrl));
     }
   }
 

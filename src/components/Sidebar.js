@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navItems } from "@/lib/nav";
+import { navItems as defaultNavItems } from "@/lib/nav";
 import InstallButton from "@/components/InstallButton";
 import {
   Shield,
@@ -12,22 +12,33 @@ import {
 } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
-
-
 const roleColors = {
   Admin: { bg: "bg-purple-500/20", text: "text-purple-400", icon: Shield },
   Poruppalar: { bg: "bg-blue-500/20", text: "text-blue-400", icon: Star },
   Voter: { bg: "bg-green-500/20", text: "text-green-400", icon: Users },
 };
 
-export default function Sidebar({ user: initialUser }) {
+export default function Sidebar({ user: initialUser, navItems, activeTabId, onNavClick, isShell = false }) {
   const { data: session } = useSession();
   const user = initialUser || session?.user;
   const pathname = usePathname();
   const role = user?.role || "Voter";
-  const items = navItems[role] || navItems.Voter;
+  
+  const items = navItems || (defaultNavItems[role] || defaultNavItems.Voter);
   const roleStyle = roleColors[role] || roleColors.Voter;
   const RoleIcon = roleStyle.icon;
+
+  const handleClick = (e, item) => {
+    if (isShell && onNavClick) {
+      e.preventDefault();
+      onNavClick(item.id);
+    }
+  };
+
+  const isActive = (item) => {
+    if (isShell) return activeTabId === item.id;
+    return pathname === item.href;
+  };
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-surface dark:bg-background/80 backdrop-blur-xl border-r border-surface-border sticky top-0 h-screen z-30 transition-colors shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
@@ -62,12 +73,14 @@ export default function Sidebar({ user: initialUser }) {
 
       {/* Nav */}
       <nav className="flex-1 p-3 mt-4 space-y-1 overflow-y-auto">
-        {items.map(({ href, label, labelTa, icon: Icon }) => {
-          const active = pathname === href;
+        {items.map((item) => {
+          const active = isActive(item);
+          const Icon = item.icon;
           return (
             <Link
-              key={href}
-              href={href}
+              key={item.id || item.href}
+              href={item.href}
+              onClick={(e) => handleClick(e, item)}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                 active
                   ? "bg-maroon text-gold"
@@ -76,8 +89,8 @@ export default function Sidebar({ user: initialUser }) {
             >
               <Icon size={18} className={active ? "text-gold" : "group-hover:text-foreground"} />
               <div>
-                <p className="text-sm font-medium leading-none">{label}</p>
-                <p className="text-[10px] mt-1 opacity-50 tamil">{labelTa}</p>
+                <p className="text-sm font-medium leading-none">{item.label}</p>
+                <p className="text-[10px] mt-1 opacity-50 tamil">{item.labelTa}</p>
               </div>
             </Link>
           );
